@@ -1,0 +1,121 @@
+{
+  "name": "Ultra-MD",
+  "description": "I am Ultra-MD WhatsApp MultiDevice Bot built in NodeJs to enhance the experience.",
+  "logo": "https://i.ibb.co/7JcYBD5Y/cbb9f804644ae8c4.jpg",
+  "keywords": ["Ultra-MD"],
+  "repository": "https://github.com/xhclintohn/Ultra-MD",
+  "stack": "container",
+  "env": { 
+      "SESSION_ID": {
+      "description": "your session id",
+      "required": true,
+      "value": ""
+    },
+    "MODE": {
+      "description": "mode public or self",
+      "required": true,
+      "value": "public"
+    },
+    "BOT_NAME": {
+      "description": "change bot name what you want!",
+      "required": false,
+      "value": "𝐔𝐋𝐓𝐑𝐀-𝐌𝐃 "
+    },
+    "MENU_IMAGE": {
+      "description": "change menu image if want otherwise use default",
+      "required": false,
+      "value": "https://i.ibb.co/7JcYBD5Y/cbb9f804644ae8c4.jpg"
+    },
+    "DESCRIPTION": {
+      "description": "add caption for menu and etc",
+      "required": false,
+      "value": "© ᴘᴏᴡᴇʀᴇᴅ ʙʏ 𝐔𝐋𝐓𝐑𝐀-𝐌𝐃 "
+    },
+    "ANTI_DELETE": {
+      "description": "set path for antidelete for same chat set to same",
+      "required": true,
+      "value": "inbox"
+    },
+    "ANTI_DELETE_PATH": {
+      "description": "make it true for use anti delete",
+      "required": true,
+      "value": "true"
+    },
+    
+    "AUTO_STATUS_SEEN": {
+      "description": "make it true if you want bot to view status",
+      "required": false,
+      "value": "true"
+    },
+    "AUTO_STATUS_REPLY": {
+      "description": "make it true if you want to send message after seen status",
+      "required": false,
+      "value": "false"
+    },
+    "STATUS_READ_MSG": {
+      "description": "set your status reply message",
+      "required": false,
+      "value": "𝐔𝐋𝐓𝐑𝐀-𝐌𝐃 👻🤍*"
+    },
+    "OWNER_NAME": {
+      "description": "set your status reply message",
+      "required": false,
+      "value": "𝐱𝐡_𝐜𝐥𝐢𝐧𝐭𝐨𝐧"
+    },
+    "OWNER_NUMBER": {
+      "description": "set your status reply message",
+      "required": false,
+      "value": "254735342808"
+    },
+    "AUTO_READ": {
+      "description": "make it true if you want bot to read message",
+      "required": false,
+      "value": "false"
+    },
+    "AUTO_TYPING": {
+      "description": "make it true if you want bot to show typing",
+      "required": false,
+      "value": "false"
+    },
+    "AUTO_RECORDING": {
+      "description": "make it true if you want bot to show recording audio",
+      "required": false,
+      "value": "false"
+    },
+    "ALWAYS_ONLINE": {
+      "description": "make it true if you want bot to show always online",
+      "required": false,
+      "value": "false"
+    },
+    "AUTO_BLOCK": {
+      "description": "make it true if you want bot to auto block only 212 numbers",
+      "required": false,
+      "value": "false"
+    },
+    "REJECT_CALL": {
+      "description": "make it true if you want the bot to reject call",
+      "required": false,
+      "value": "false"
+    },
+    "PREFIX": {
+      "description": "Your Bot Prefix default (.)",
+      "required": false,
+      "value": "."
+    }
+    },
+    "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/DuckyTeam/heroku-buildpack-imagemagick.git"
+    },
+    {
+      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest"
+    },
+    {
+      "url": "https://github.com/clhuang/heroku-buildpack-webp-binaries.git"
+    }
+  ]
+}
+
