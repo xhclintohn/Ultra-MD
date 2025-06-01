@@ -1,54 +1,95 @@
 import axios from "axios";
 import yts from "yt-search";
-import config from '../config.cjs';
+import config from "../config.cjs";
 
-const song = async (m, gss) => {
-  const prefix = config.PREFIX;
-  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
-  const args = m.body.slice(prefix.length + cmd.length).trim().split(" ");
+const song = async (m, Matrix) => {
+  try {
+    const prefix = config.Prefix || config.PREFIX || ".";
+    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+    const args = m.body.slice(prefix.length + cmd.length).trim().split(" ");
 
-  if (cmd === "song") {
-    if (args.length === 0 || !args.join(" ")) {
-      return m.reply("*Please provide a song name or keywords to search for.*");
-    }
+    if (cmd === "song") {
+      if (args.length === 0 || !args.join(" ")) {
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ Yo, *Toxic-MD* needs a song name or keywords, fam! 🎵
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
+      }
 
-    const searchQuery = args.join(" ");
-    m.reply("*🎥 Searching for the video...*");
+      const searchQuery = args.join(" ");
+      await Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* huntin’ for "${searchQuery}"... 🎥🔍
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
 
-    try {
       const searchResults = await yts(searchQuery);
       if (!searchResults.videos || searchResults.videos.length === 0) {
-        return m.reply(`❌ No results found for "${searchQuery}".`);
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ No tracks found for "${searchQuery}". You slippin’! 💀
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
       }
 
       const firstResult = searchResults.videos[0];
       const videoUrl = firstResult.url;
 
       // Fetch video using API
-      const apiUrl = `https://apis.davidcyriltech.my.id/download/ytmp4?url=${videoUrl}`;
-      const response = await axios.get(apiUrl);
+      const apiUrl = `https://apis.davidcyriltech.my.id/youtube/mp4?url=${videoUrl}`;
+      let response;
+      try {
+        response = await axios.get(apiUrl);
+        console.log(`API response:`, JSON.stringify(response.data, null, 2)); // Debug log
+      } catch (apiError) {
+        console.error(`API error:`, apiError.message);
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* couldn’t fetch "${searchQuery}". API’s actin’ weak! 😡
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
+      }
 
-      if (!response.data.success) {
-        return m.reply(`❌ Failed to fetch video for "${searchQuery}".`);
+      if (!response.data?.success || !response.data?.result) {
+        console.error(`Invalid API response:`, response.data);
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* got junk data for "${searchQuery}". API’s trash! 😤
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
       }
 
       const { title, download_url } = response.data.result;
+      if (!title || !download_url) {
+        console.error(`Missing title or download_url:`, response.data.result);
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* can’t play "${searchQuery}". No video link, fam! 😣
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
+      }
 
       // Send the video file
-      await gss.sendMessage(
+      await Matrix.sendMessage(
         m.from,
         {
           video: { url: download_url },
           mimetype: "video/mp4",
-          caption: `*${title}*\n\nPowered By JawadTechX 💜`,
+          caption: `◈━━━━━━━━━━━━━━━━◈
+│❒ *${title}* dropped by *Toxic-MD*! Blast it, fam! 🎬🔥
+◈━━━━━━━━━━━━━━━━◈`,
         },
         { quoted: m }
       );
-
-    } catch (error) {
-      console.error(error);
-      m.reply("❌ An error occurred while processing your request.");
     }
+  } catch (error) {
+    console.error(`❌ Song error: ${error.message}`);
+    await Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* hit a snag, fam! Try another track! 😈
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   }
 };
 
