@@ -24,10 +24,10 @@ const config = {
   BOT_NAME: process.env.BOT_NAME || "Ultra-MD",
   MENU_IMAGE: process.env.MENU_IMAGE || "https://files.catbox.moe/7l1tt5.jpg",
   DESCRIPTION: process.env.DESCRIPTION || "© by 𝐱𝐡_𝐜𝐥𝐢𝐧𝐭𝐨𝐧",
-  OWNER_NAME: process.env.OWNER_NAME || "xhclinton",
+  OWNER_NAME: process.env.OWNER_NAME || "xh_clinton",
   OWNER_NUMBER: process.env.OWNER_NUMBER || "254735342808",
   GEMINI_KEY: process.env.GEMINI_KEY || "AIzaSyCUPaxfIdZawsKZKqCqJcC-GWiQPCXKTDc",
-  WELCOME: process.env.WELCOME !== undefined ? process.env.WELCOME === 'true' : false, 
+  WELCOME: process.env.WELCOME !== undefined ? process.env.WELCOME === 'false' : false, 
 };
 
 
