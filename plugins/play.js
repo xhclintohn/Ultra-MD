@@ -1,55 +1,77 @@
 import axios from "axios";
 import yts from "yt-search";
-import config from '../config.cjs';
+import config from "../config.cjs";
 
-const play = async (m, gss) => {
-  const prefix = config.PREFIX;
-  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
-  const args = m.body.slice(prefix.length + cmd.length).trim().split(" ");
+const play = async (m, Matrix) => {
+  try {
+    const prefix = config.Prefix || config.PREFIX || ".";
+    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+    const args = m.body.slice(prefix.length + cmd.length).trim().split(" ");
 
-  if (cmd === "play") {
-    if (args.length === 0 || !args.join(" ")) {
-      return m.reply("*Please provide a song name or keywords to search for.*");
-    }
+    if (cmd === "play") {
+      if (args.length === 0 || !args.join(" ")) {
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ Yo, give me a song name or keywords to search, fam! 😎
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
+      }
 
-    const searchQuery = args.join(" ");
-    m.reply("*🎧 Searching for the song...*");
+      const searchQuery = args.join(" ");
+      await Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* huntin’ for "${searchQuery}"... 🎧
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
 
-    try {
       const searchResults = await yts(searchQuery);
       if (!searchResults.videos || searchResults.videos.length === 0) {
-        return m.reply(`❌ No results found for "${searchQuery}".`);
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ No tracks found for "${searchQuery}". You slippin’! 💀
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
       }
 
-      const firstResult = searchResults.videos[0];
-      const videoUrl = firstResult.url;
+      const song = searchResults.videos[0];
+      const apiKey = "gifted_api_se5dccy";
+      const apiUrl = `https://api.giftedtech.web.id/api/download/dlmp3?apikey=${apiKey}&url=${encodeURIComponent(song.url)}`;
 
-      // First API endpoint
-      const apiUrl = `https://api.davidcyriltech.my.id/download/ytmp3?url=${videoUrl}`;
       const response = await axios.get(apiUrl);
-
-      if (!response.data.success) {
-        return m.reply(`❌ Failed to fetch audio for "${searchQuery}".`);
+      if (!response.data.status) {
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* couldn’t rip "${song.title}". API’s actin’ weak! 😡
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
       }
 
-      const { title, download_url } = response.data.result;
+      const { title, audio } = response.data.result;
 
       // Send the audio file
-      await gss.sendMessage(
+      await Matrix.sendMessage(
         m.from,
         {
-          audio: { url: download_url },
+          audio: { url: audio },
           mimetype: "audio/mp4",
           ptt: false,
         },
         { quoted: m }
       );
 
-      m.reply(`✅ *${title}* has been downloaded successfully!`);
-    } catch (error) {
-      console.error(error);
-      m.reply("❌ An error occurred while processing your request.");
+      await Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *${title}* dropped by *Toxic-MD*! Blast it, fam! 🎶
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
     }
+  } catch (error) {
+    console.error(`❌ Play error: ${error.message}`);
+    await Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* hit a snag, fam! Try again or get a better song! 😈
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   }
 };
 
