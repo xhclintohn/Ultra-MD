@@ -149,7 +149,6 @@ const toxicReplies = [
 
 async function start() {
   try {
-    // Load session before initializing socket
     await loadBase64Session();
     const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
     const { version, isLatest } = await fetchLatestBaileysVersion();
@@ -353,7 +352,6 @@ async function start() {
   }
 }
 
-// Start the bot directly
 start();
 
 app.get("/", (req, res) => {
