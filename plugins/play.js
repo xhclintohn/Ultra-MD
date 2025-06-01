@@ -37,22 +37,43 @@ const play = async (m, Matrix) => {
       const apiKey = "gifted_api_se5dccy";
       const apiUrl = `https://api.giftedtech.web.id/api/download/dlmp3?apikey=${apiKey}&url=${encodeURIComponent(song.url)}`;
 
-      const response = await axios.get(apiUrl);
-      if (!response.data.status) {
+      let response;
+      try {
+        response = await axios.get(apiUrl);
+        console.log(`API response:`, JSON.stringify(response.data, null, 2)); // Debug log
+      } catch (apiError) {
+        console.error(`API error:`, apiError.message);
         return Matrix.sendMessage(m.from, {
           text: `◈━━━━━━━━━━━━━━━━◈
-│❒ *Toxic-MD* couldn’t rip "${song.title}". API’s actin’ weak! 😡
+│❒ *Toxic-MD* couldn’t hit the API for "${song.title}". Server’s actin’ up! 😡
 ◈━━━━━━━━━━━━━━━━◈`,
         }, { quoted: m });
       }
 
-      const { title, audio } = response.data.result;
+      if (!response.data?.success || !response.data?.result) {
+        console.error(`Invalid API response:`, response.data);
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* got junk data for "${song.title}". API’s trash! 😤
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
+      }
+
+      const { title, download_url } = response.data.result;
+      if (!title || !download_url) {
+        console.error(`Missing title or download_url in response:`, response.data.result);
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* can’t play "${song.title}". No audio link, fam! 😣
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
+      }
 
       // Send the audio file
       await Matrix.sendMessage(
         m.from,
         {
-          audio: { url: audio },
+          audio: { url: download_url },
           mimetype: "audio/mp4",
           ptt: false,
         },
@@ -69,7 +90,7 @@ const play = async (m, Matrix) => {
     console.error(`❌ Play error: ${error.message}`);
     await Matrix.sendMessage(m.from, {
       text: `◈━━━━━━━━━━━━━━━━◈
-│❒ *Toxic-MD* hit a snag, fam! Try again or get a better song! 😈
+│❒ *Toxic-MD* hit a snag, fam! Try again or pick a better track! 😈
 ◈━━━━━━━━━━━━━━━━◈`,
     }, { quoted: m });
   }
