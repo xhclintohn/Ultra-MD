@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
-import pkg from '@whiskeysockets/baileys';
+import pkg from 'baileys-pro';
 const { generateWAMessageFromContent, proto } = pkg;
 import config from '../config.cjs';
 
