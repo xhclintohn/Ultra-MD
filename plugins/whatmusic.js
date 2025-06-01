@@ -1,36 +1,41 @@
-import fs from 'fs';
-import acrcloud from 'acrcloud';
-import config from '../config.cjs';
-
+import fs from "fs";
+import acrcloud from "acrcloud";
+import config from "../config.cjs";
 
 const acr = new acrcloud({
-host: 'identify-eu-west-1.acrcloud.com',
-access_key: '716b4ddfa557144ce0a459344fe0c2c9',
-access_secret: 'Lz75UbI8g6AzkLRQgTgHyBlaQq9YT5wonr3xhFkf'
+  host: "identify-eu-west-1.acrcloud.com",
+  access_key: "716b4ddfa557144ce0a459344fe0c2c9",
+  access_secret: "Lz75UbI8g6AzkLRQgTgHyBlaQq9YT5wonr3xhFkf",
 });
 
-const shazam = async (m, gss) => {
+const shazam = async (m, Matrix) => {
   try {
-    const prefix = config.PREFIX;
-const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
-const text = m.body.slice(prefix.length + cmd.length).trim();
+    const prefix = config.Prefix || config.PREFIX || ".";
+    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+    const text = m.body.slice(prefix.length + cmd.length).trim();
 
-    const validCommands = ['shazam', 'find', 'whatmusic'];
+    const validCommands = ["shazam", "find", "whatmusic"];
     if (!validCommands.includes(cmd)) return;
-    
-    const quoted = m.quoted || {}; 
 
-    if (!quoted || (quoted.mtype !== 'audioMessage' && quoted.mtype !== 'videoMessage')) {
-      return m.reply('You asked about music. Please provide a quoted audio or video message for identification.');
+    const quoted = m.quoted || {};
+    if (!quoted || (quoted.mtype !== "audioMessage" && quoted.mtype !== "videoMessage")) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ Yo, *Toxic-MD* needs a quoted audio or video to ID, fam! 🎵
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
     }
 
-    const mime = m.quoted.mimetype;
     try {
       const media = await m.quoted.download();
       const filePath = `./${Date.now()}.mp3`;
       fs.writeFileSync(filePath, media);
 
-      m.reply('Identifying the music, please wait...');
+      await Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* sniffin’ out that track, hold up... 🔍
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
 
       const res = await acr.identify(fs.readFileSync(filePath));
       const { code, msg } = res.status;
@@ -40,23 +45,33 @@ const text = m.body.slice(prefix.length + cmd.length).trim();
       }
 
       const { title, artists, album, genres, release_date } = res.metadata.music[0];
-      const txt = `𝚁𝙴𝚂𝚄𝙻𝚃 
-      • 📌 *TITLE*: ${title}
-      • 👨‍🎤 𝙰𝚁𝚃𝙸𝚂𝚃: ${artists ? artists.map(v => v.name).join(', ') : 'NOT FOUND'}
-      • 💾 𝙰𝙻𝙱𝚄𝙼: ${album ? album.name : 'NOT FOUND'}
-      • 🌐 𝙶𝙴𝙽𝚁𝙴: ${genres ? genres.map(v => v.name).join(', ') : 'NOT FOUND'}
-      • 📆 RELEASE DATE: ${release_date || 'NOT FOUND'}
-      `.trim();
+      const txt = `◈━━━━━━━━━━━━━━━━◈
+│❒ 🎉 *Toxic-MD* FOUND IT! 🎉
+│❒ 📌 *Title*: ${title}
+│❒ 👨‍🎤 *Artist*: ${artists ? artists.map((v) => v.name).join(", ") : "Unknown"}
+│❒ 💿 *Album*: ${album ? album.name : "Unknown"}
+│❒ 🎸 *Genre*: ${genres ? genres.map((v) => v.name).join(", ") : "Unknown"}
+│❒ 📅 *Release*: ${release_date || "Unknown"}
+◈━━━━━━━━━━━━━━━━◈`;
 
       fs.unlinkSync(filePath);
-      m.reply(txt);
+      await Matrix.sendMessage(m.from, { text: txt }, { quoted: m });
     } catch (error) {
-      console.error(error);
-      m.reply('An error occurred during music identification.');
+      console.error(`🎵 Shazam error: ${error.message}`);
+      fs.unlinkSync(filePath); // Clean up even on error
+      await Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* couldn’t ID that track, fam! Try another! 😣
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
     }
   } catch (error) {
-    console.error('Error:', error);
-    m.reply('An Error Occurred While Processing The Command.');
+    console.error(`❌ Shazam error: ${error.message}`);
+    await Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* hit a glitch, fam! Retry that jam! 😈
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   }
 };
 
