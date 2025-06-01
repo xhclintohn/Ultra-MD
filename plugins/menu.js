@@ -122,8 +122,7 @@ const menu = async (m, Matrix) => {
 │ ✘ 9. *${toFancyFont("Stalk")}*
 ╰─────────────
 
-> ${toFancyFont("Powered by Toxic-MD")} 🖤 xh_clinton
-`;
+> Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ`;
 
     // Fetch image
     let menuImage;
@@ -343,8 +342,7 @@ const menu = async (m, Matrix) => {
 
 ${menuResponse}
 
-> ${toFancyFont("Powered by Toxic-MD")} 🖤 xh_clinton
-`;
+> Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ`;
 
       // Send response
       await Matrix.sendMessage(
