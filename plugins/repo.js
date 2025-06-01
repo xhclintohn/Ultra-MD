@@ -1,73 +1,69 @@
 import axios from "axios";
-import config from '../config.cjs';
+import config from "../config.cjs";
 
-const repo = async (m, gss) => {
-  const prefix = config.PREFIX;
-  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+const repo = async (m, Matrix) => {
+  try {
+    const prefix = config.Prefix || config.PREFIX || ".";
+    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
 
-  if (["repo", "sc", "script", "info"].includes(cmd)) {
-    const githubRepoURL = "https://github.com/XdTechPro/JAWAD-MD";
+    if (!["repo", "sc", "script", "info"].includes(cmd)) return;
 
-    try {
-      // Extract username and repo name from the URL
-      const [, username, repoName] = githubRepoURL.match(/github\.com\/([^/]+)\/([^/]+)/);
+    const githubRepoURL = "https://github.com/xhclintohn/Toxic-MD";
 
-      // Fetch repository details using GitHub API
-      const response = await axios.get(`https://api.github.com/repos/${username}/${repoName}`);
-
-      if (!response.data) {
-        throw new Error("GitHub API request failed.");
-      }
-
-      const repoData = response.data;
-
-      // Format the repository information
-      const formattedInfo = `*BOT NAME:*\n> ${repoData.name}\n\n*OWNER NAME:*\n> ${repoData.owner.login}\n\n*STARS:*\n> ${repoData.stargazers_count}\n\n*FORKS:*\n> ${repoData.forks_count}\n\n*GITHUB LINK:*\n> ${repoData.html_url}\n\n*DESCRIPTION:*\n> ${repoData.description || "No description"}\n\n*Don't Forget To Star and Fork Repository*\n\n> *© Powered By JawadTechX 🖤*`;
-
-      // Send an image with the formatted info as a caption
-      await gss.sendMessage(
-        m.from,
-        {
-          image: { url: "https://files.catbox.moe/juroe8.jpg" },
-          caption: formattedInfo,
-          contextInfo: {
-            mentionedJid: [m.sender],
-            forwardingScore: 999,
-            isForwarded: true,
-            forwardedNewsletterMessageInfo: {
-              newsletterJid: "120363354023106228@newsletter",
-              newsletterName: "JawadTechX",
-              serverMessageId: 143,
-            },
-          },
-        },
-        { quoted: m }
-      );
-
-      // Send the audio file with context info
-      await gss.sendMessage(
-        m.from,
-        {
-          audio: { url: "https://github.com/XdTechPro/KHAN-DATA/raw/refs/heads/main/autovoice/menunew.m4a" },
-          mimetype: "audio/mp4",
-          ptt: true,
-          contextInfo: {
-            mentionedJid: [m.sender],
-            forwardingScore: 999,
-            isForwarded: true,
-            forwardedNewsletterMessageInfo: {
-              newsletterJid: "120363354023106228@newsletter",
-              newsletterName: "JawadTechX",
-              serverMessageId: 143,
-            },
-          },
-        },
-        { quoted: m }
-      );
-    } catch (error) {
-      console.error("Error in repo command:", error);
-      m.reply("Sorry, something went wrong while fetching the repository information. Please try again later.");
+    // Extract username and repo name
+    const [, username, repoName] = githubRepoURL.match(/github\.com\/([^/]+)\/([^/]+)/) || [];
+    if (!username || !repoName) {
+      throw new Error("Invalid GitHub URL format.");
     }
+
+    // Fetch repo details
+    const response = await axios.get(`https://api.github.com/repos/${username}/${repoName}`);
+    const repoData = response.data;
+
+    if (!repoData) {
+      throw new Error("GitHub API request failed.");
+    }
+
+    // Format repo info
+    const formattedInfo = `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* Repo Stats 🌟
+│❒ 📛 *Bot*: ${repoData.name}
+│❒ 👑 *Owner*: ${repoData.owner.login}
+│❒ ⭐ *Stars*: ${repoData.stargazers_count}
+│❒ 🍴 *Forks*: ${repoData.forks_count}
+│❒ 🔗 *Link*: ${repoData.html_url}
+│❒ 📝 *Description*: ${repoData.description || "No description"}
+│❒ 💥 Star & fork it, fam!
+◈━━━━━━━━━━━━━━━━◈
+│❒ Powered By *Toxic-MD* 🖤
+◈━━━━━━━━━━━━━━━━◈`;
+
+    // Send image with caption
+    await Matrix.sendMessage(
+      m.from,
+      {
+        image: { url: "https://files.catbox.moe/juroe8.jpg" },
+        caption: formattedInfo,
+        contextInfo: {
+          mentionedJid: [m.sender],
+          forwardingScore: 999,
+          isForwarded: true,
+          forwardedNewsletterMessageInfo: {
+            newsletterJid: "120363322461279856@newsletter",
+            newsletterName: "ToxicTech",
+            serverMessageId: 143,
+          },
+        },
+      },
+      { quoted: m }
+    );
+  } catch (error) {
+    console.error(`❌ Repo error: ${error.message}`);
+    await Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* hit a snag fetchin’ repo info, fam! Try again! 😈
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   }
 };
 
