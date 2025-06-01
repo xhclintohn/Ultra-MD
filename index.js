@@ -21,10 +21,6 @@ import pkg from "./lib/autoreact.cjs";
 const { emojis, doReact } = pkg;
 const prefix = process.env.PREFIX || config.PREFIX;
 const app = express();
-const orange = chalk.bold.hex("#FFA500");
-const lime = chalk.bold.hex("#32CD32");
-let useQR = false;
-let hasSentStartMessage = false;
 const PORT = process.env.PORT || 3000;
 
 const MAIN_LOGGER = pino({
@@ -174,11 +170,6 @@ async function start() {
 
     Matrix.ev.on("connection.update", async (update) => {
       const { connection, lastDisconnect } = update;
-      if (connection === "connecting") {
-        console.log(`🔄 Establishing connection to WhatsApp servers...`);
-        return;
-      }
-
       if (connection === "close") {
         const statusCode = lastDisconnect.error?.output?.statusCode;
         switch (statusCode) {
@@ -325,11 +316,9 @@ async function start() {
         // Status handling
         if (mek.key.remoteJid === "status@broadcast" && config.AUTO_STATUS_SEEN) {
           await Matrix.readMessages([mek.key]);
-          console.log(chalk.blue(`Viewed status ${mek.key.id}`));
           if (config.AUTO_STATUS_REPLY) {
             const randomReply = toxicReplies[Math.floor(Math.random() * toxicReplies.length)];
             await Matrix.sendMessage(fromJid, { text: randomReply }, { quoted: mek });
-            console.log(chalk.blue(`Replied to status ${mek.key.id} with: ${randomReply}`));
           }
           return;
         }
@@ -338,7 +327,6 @@ async function start() {
         if (!mek.key.fromMe && config.AUTO_REACT && mek.message) {
           const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
           await doReact(randomEmoji, mek, Matrix);
-          console.log(chalk.blue(`Auto-reacted with ${randomEmoji} to ${mek.key.id}`));
         }
 
         // Command handler
