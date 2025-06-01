@@ -89,14 +89,43 @@ function toFancyFont(text, isUpperCase = false) {
     .join("");
 }
 
+// Retry utility
+async function fetchImageWithRetry(url, retries = 3, delay = 2000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await axios.get(url, { responseType: "arraybuffer" });
+      return Buffer.from(response.data, "binary");
+    } catch (error) {
+      if (error.response?.status === 429 && i < retries - 1) {
+        console.log(`Rate limit hit, retrying in ${delay}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+      throw error;
+    }
+  }
+}
+
 const menu = async (m, Matrix) => {
   const prefix = config.PREFIX;
   const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
   const mode = config.MODE === "public" ? "public" : "private";
-  const totalCommands = 70; // Approximate count of all commands
+  const totalCommands = 70;
 
   const validCommands = ["list", "help", "menu"];
+  const subMenuCommands = [
+    "download",
+    "converter",
+    "ai",
+    "tools",
+    "group",
+    "search",
+    "main",
+    "owner",
+    "stalk",
+  ];
 
+  // Handle main menu
   if (validCommands.includes(cmd)) {
     const mainMenu = `
 ╭─❒ 「 ${toFancyFont("Toxic-MD")} Command Menu ⚠ 」
@@ -108,38 +137,86 @@ const menu = async (m, Matrix) => {
 │ 📚 *${toFancyFont("Library")}*: Baileys
 ╰─────────────
 
-> ${pushwish} *${m.pushName}*! Reply with a number (1-9) to select a menu:
+> ${pushwish} *${m.pushName}*! Tap a button to select a menu:
 
-╭─❒ 「 ${toFancyFont("MENU LIST")} 📑 」
-│ ✘ 1. *${toFancyFont("Download")}*
-│ ✘ 2. *${toFancyFont("Converter")}*
-│ ✘ 3. *${toFancyFont("AI")}*
-│ ✘ 4. *${toFancyFont("Tools")}*
-│ ✘ 5. *${toFancyFont("Group")}*
-│ ✘ 6. *${toFancyFont("Search")}*
-│ ✘ 7. *${toFancyFont("Main")}*
-│ ✘ 8. *${toFancyFont("Owner")}*
-│ ✘ 9. *${toFancyFont("Stalk")}*
-╰─────────────
+> Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ
+`;
 
-> Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ`;
-
-    // Fetch image
+    // Fetch image with retry
     let menuImage;
+    const primaryUrl = "https://files.catbox.moe/y2utve.jpg";
+    const fallbackUrl = "https://files.catbox.moe/9kL5x9Q.jpg";
     try {
-      const response = await axios.get("https://files.catbox.moe/y2utve.jpg", { responseType: "arraybuffer" });
-      menuImage = Buffer.from(response.data, "binary");
+      menuImage = await fetchImageWithRetry(primaryUrl);
     } catch (error) {
-      console.error("❌ Error fetching menu image:", error);
-      return Matrix.sendMessage(m.from, { text: "Failed to load menu image." }, { quoted: m });
+      console.error("❌ Failed to fetch primary image:", error);
+      try {
+        menuImage = await fetchImageWithRetry(fallbackUrl);
+      } catch (fallbackError) {
+        console.error("❌ Failed to fetch fallback image:", fallbackError);
+        await Matrix.sendMessage(m.from, { text: mainMenu }, { quoted: m });
+        return Matrix.sendMessage(m.from, {
+          audio: { url: "https://files.catbox.moe/59g7ny.mp4" },
+          mimetype: "audio/mp4",
+          ptt: true,
+        }, { quoted: m });
+      }
     }
 
-    // Send menu
-    const sentMessage = await Matrix.sendMessage(
+    // Send menu with buttons
+    await Matrix.sendMessage(
       m.from,
       {
         image: menuImage,
         caption: mainMenu,
+        viewOnce: true,
+        buttons: [
+          {
+            buttonId: `${prefix}download`,
+            buttonText: { displayText: `📥 ${toFancyFont("Download")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}converter`,
+            buttonText: { displayText: `🔄 ${toFancyFont("Converter")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}ai`,
+            buttonText: { displayText: `🤖 ${toFancyFont("AI")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}tools`,
+            buttonText: { displayText: `🛠 ${toFancyFont("Tools")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}group`,
+            buttonText: { displayText: `👥 ${toFancyFont("Group")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}search`,
+            buttonText: { displayText: `🔍 ${toFancyFont("Search")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}main`,
+            buttonText: { displayText: `⚙ ${toFancyFont("Main")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}owner`,
+            buttonText: { displayText: `🔒 ${toFancyFont("Owner")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}stalk`,
+            buttonText: { displayText: `🕵 ${toFancyFont("Stalk")}` },
+            type: 1,
+          },
+        ],
         contextInfo: {
           mentionedJid: [m.sender],
           forwardingScore: 999,
@@ -159,22 +236,17 @@ const menu = async (m, Matrix) => {
       },
       { quoted: m }
     );
+  }
 
-    // Set up listener for menu selection
-    Matrix.ev.on("messages.upsert", async (event) => {
-      const receivedMessage = event.messages[0];
-      if (!receivedMessage?.message?.extendedTextMessage) return;
+  // Handle sub-menu commands
+  if (subMenuCommands.includes(cmd)) {
+    let menuTitle;
+    let menuResponse;
 
-      const receivedText = receivedMessage.message.extendedTextMessage.text.trim();
-      if (receivedMessage.message.extendedTextMessage.contextInfo?.stanzaId !== sentMessage.key.id) return;
-
-      let menuTitle;
-      let menuResponse;
-
-      switch (receivedText) {
-        case "1":
-          menuTitle = "Download";
-          menuResponse = `
+    switch (cmd) {
+      case "download":
+        menuTitle = "Download";
+        menuResponse = `
 ╭─❒ 「 ${toFancyFont("Download")} 📥 」
 │ ✘ *${toFancyFont("apk")}*
 │ ✘ *${toFancyFont("facebook")}*
@@ -193,11 +265,11 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("tiktok")}*
 ╰─────────────
 `;
-          break;
+        break;
 
-        case "2":
-          menuTitle = "Converter";
-          menuResponse = `
+      case "converter":
+        menuTitle = "Converter";
+        menuResponse = `
 ╭─❒ 「 ${toFancyFont("Converter")} 🔄 」
 │ ✘ *${toFancyFont("attp")}*
 │ ✘ *${toFancyFont("attp2")}*
@@ -208,11 +280,11 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("mp3")}*
 ╰─────────────
 `;
-          break;
+        break;
 
-        case "3":
-          menuTitle = "AI";
-          menuResponse = `
+      case "ai":
+        menuTitle = "AI";
+        menuResponse = `
 ╭─❒ 「 ${toFancyFont("AI")} 🤖 」
 │ ✘ *${toFancyFont("ai")}*
 │ ✘ *${toFancyFont("bug")}*
@@ -223,11 +295,11 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("gemini")}*
 ╰─────────────
 `;
-          break;
+        break;
 
-        case "4":
-          menuTitle = "Tools";
-          menuResponse = `
+      case "tools":
+        menuTitle = "Tools";
+        menuResponse = `
 ╭─❒ 「 ${toFancyFont("Tools")} 🛠 」
 │ ✘ *${toFancyFont("calculator")}*
 │ ✘ *${toFancyFont("tempmail")}*
@@ -236,11 +308,11 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("tts")}*
 ╰─────────────
 `;
-          break;
+        break;
 
-        case "5":
-          menuTitle = "Group";
-          menuResponse = `
+      case "group":
+        menuTitle = "Group";
+        menuResponse = `
 ╭─❒ 「 ${toFancyFont("Group")} 👥 」
 │ ✘ *${toFancyFont("linkgroup")}*
 │ ✘ *${toFancyFont("setppgc")}*
@@ -260,11 +332,11 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("getbio")}*
 ╰─────────────
 `;
-          break;
+        break;
 
-        case "6":
-          menuTitle = "Search";
-          menuResponse = `
+      case "search":
+        menuTitle = "Search";
+        menuResponse = `
 ╭─❒ 「 ${toFancyFont("Search")} 🔍 」
 │ ✘ *${toFancyFont("play")}*
 │ ✘ *${toFancyFont("yts")}*
@@ -279,11 +351,11 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("lyrics")}*
 ╰─────────────
 `;
-          break;
+        break;
 
-        case "7":
-          menuTitle = "Main";
-          menuResponse = `
+      case "main":
+        menuTitle = "Main";
+        menuResponse = `
 ╭─❒ 「 ${toFancyFont("Main")} ⚙ 」
 │ ✘ *${toFancyFont("ping")}*
 │ ✘ *${toFancyFont("alive")}*
@@ -291,75 +363,3 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("menu")}*
 │ ✘ *${toFancyFont("infobot")}*
 ╰─────────────
-`;
-          break;
-
-        case "8":
-          menuTitle = "Owner";
-          menuResponse = `
-╭─❒ 「 ${toFancyFont("Owner")} 🔒 」
-│ ✘ *${toFancyFont("join")}*
-│ ✘ *${toFancyFont("leave")}*
-│ ✘ *${toFancyFont("block")}*
-│ ✘ *${toFancyFont("unblock")}*
-│ ✘ *${toFancyFont("setppbot")}*
-│ ✘ *${toFancyFont("anticall")}*
-│ ✘ *${toFancyFont("setstatus")}*
-│ ✘ *${toFancyFont("setnamebot")}*
-│ ✘ *${toFancyFont("autotyping")}*
-│ ✘ *${toFancyFont("alwaysonline")}*
-│ ✘ *${toFancyFont("autoread")}*
-│ ✘ *${toFancyFont("autosview")}*
-╰─────────────
-`;
-          break;
-
-        case "9":
-          menuTitle = "Stalk";
-          menuResponse = `
-╭─❒ 「 ${toFancyFont("Stalk")} 🕵 」
-│ ✘ *${toFancyFont("truecaller")}*
-│ ✘ *${toFancyFont("instastalk")}*
-│ ✘ *${toFancyFont("githubstalk")}*
-╰─────────────
-`;
-          break;
-
-        default:
-          menuTitle = "Invalid Choice";
-          menuResponse = `*${toFancyFont("Invalid Reply")}* Please reply with a number between 1 to 9`;
-      }
-
-      // Format the full response
-      const fullResponse = `
-╭─❒ 「 ${toFancyFont("Toxic-MD")} - ${toFancyFont(menuTitle)} ⚠ 」
-│
-│ 🤖 *${toFancyFont("Bot")}*: ${toFancyFont("Toxic-MD")}
-│ 👤 *${toFancyFont("User")}*: ${m.pushName}
-│ 🔣 *${toFancyFont("Prefix")}*: ${prefix}
-│ 📚 *${toFancyFont("Library")}*: Baileys
-╰─────────────
-
-${menuResponse}
-
-> Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ`;
-
-      // Send response
-      await Matrix.sendMessage(
-        m.from,
-        {
-          image: menuImage,
-          caption: fullResponse,
-          contextInfo: {
-            mentionedJid: [m.sender],
-            forwardingScore: 999,
-            isForwarded: true,
-          },
-        },
-        { quoted: receivedMessage }
-      );
-    });
-  }
-};
-
-export default menu;
