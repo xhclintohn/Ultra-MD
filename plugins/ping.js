@@ -24,23 +24,23 @@ const ping = async (m, Matrix) => {
       const end = new Date().getTime();
       const responseTime = (end - start) / 1000;
 
-      // Toxic, realistic responses with minimal lines
+      // Toxic, realistic responses with desired styling
       const toxicResponses = [
-        `◈━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◈
-Yo, 😈 *Toxic-MD* is on demon time at *${responseTime.toFixed(1)}s*! Your net’s weaker than a noob’s game! 💪 ${reactionEmoji} xh_clinton’s bot don’t lag, it DOMINATES! 😈
-◈━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◈`,
-        `◈━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◈
-*Toxic-MD* snappin’ at *${responseTime.toFixed(1)}s*! Can’t keep up with this heat, fam! 🔥 ${reactionEmoji} xh_clinton’s runnin’ this, you just watchin’! 💀
-◈━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◈`,
-        `◈━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◈
-Speed? *${responseTime.toFixed(1)}s*! *Toxic-MD*’s too quick for your trash setup! 🚀 ${reactionEmoji} xh_clinton’s bot is straight-up lethal, no cap! 😎
-◈━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◈`,
-        `◈━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◈
-*Toxic-MD* at *${responseTime.toFixed(1)}s*! Zoomin’ past your slow ass! 💨 ${reactionEmoji} xh_clinton’s creation, bow down or get smoked! 💣
-◈━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◈`,
-        `◈━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◈
-Ping? *${responseTime.toFixed(1)}s*! *Toxic-MD*’s wreckin’ with this speed! ⚡ ${reactionEmoji} xh_clinton’s bot, untouchable, fam! 😈
-◈━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◈`,
+        `◈━━━━━━━━━━━━━━━━◈
+│❒ Yo, *Toxic-MD* snappin’ at *${responseTime.toFixed(1)}s*! Your net’s weak as hell, fam! ${reactionEmoji} xh_clinton’s bot owns this! 😈
+◈━━━━━━━━━━━━━━━━◈`,
+        `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* hittin’ *${responseTime.toFixed(1)}s*! Too fast for your slow ass! ${reactionEmoji} xh_clinton’s runnin’ the game! 💀
+◈━━━━━━━━━━━━━━━━◈`,
+        `◈━━━━━━━━━━━━━━━━◈
+│❒ Speed? *${responseTime.toFixed(1)}s*! *Toxic-MD* smokes your trash setup! ${reactionEmoji} xh_clinton’s bot, no mercy! 🔥
+◈━━━━━━━━━━━━━━━━◈`,
+        `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* at *${responseTime.toFixed(1)}s*! Zoomin’ past you, clown! ${reactionEmoji} xh_clinton’s creation, bow down! 💣
+◈━━━━━━━━━━━━━━━━◈`,
+        `◈━━━━━━━━━━━━━━━━◈
+│❒ Ping? *${responseTime.toFixed(1)}s*! *Toxic-MD*’s wreckin’ this! ${reactionEmoji} xh_clinton’s bot, untouchable! 😎
+◈━━━━━━━━━━━━━━━━◈`,
       ];
 
       const text = toxicResponses[Math.floor(Math.random() * toxicResponses.length)];
@@ -56,7 +56,11 @@ Ping? *${responseTime.toFixed(1)}s*! *Toxic-MD*’s wreckin’ with this speed! 
     }
   } catch (error) {
     console.error(`❌ Ping error: ${error.message}`);
-    await Matrix.sendMessage(m.from, { text: `Yo, somethin’ broke! xh_clinton’s bot is still dope, tho! 😎` }, { quoted: m });
+    await Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ Yo, somethin’ broke! xh_clinton’s bot is still dope, tho! 😎
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   }
 };
 
