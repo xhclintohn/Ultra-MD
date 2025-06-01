@@ -1,37 +1,62 @@
-import fs from 'fs';
-import config from '../config.cjs';
+import fs from "fs";
+import axios from "axios";
+import config from "../config.cjs";
 
 const alive = async (m, Matrix) => {
-  const uptimeSeconds = process.uptime();
-  const days = Math.floor(uptimeSeconds / (3600 * 24));
-  const hours = Math.floor((uptimeSeconds % (3600 * 24)) / 3600);
-  const minutes = Math.floor((uptimeSeconds % 3600) / 60);
-  const seconds = Math.floor(uptimeSeconds % 60);
-  const timeString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  try {
+    const uptimeSeconds = process.uptime();
+    const days = Math.floor(uptimeSeconds / (3600 * 24));
+    const hours = Math.floor((uptimeSeconds % (3600 * 24)) / 3600);
+    const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+    const seconds = Math.floor(uptimeSeconds % 60);
+    const timeString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
-  const prefix = config.PREFIX;
-  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
+    const prefix = config.Prefix || config.PREFIX || ".";
+    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
 
-  if (!['alive', 'uptime', 'runtime'].includes(cmd)) return;
+    if (!["alive", "uptime", "runtime"].includes(cmd)) return;
 
-  const str = `*🤖 Bot Status: Online*\n*⏳ Uptime: ${timeString}*`;
-
-  await Matrix.sendMessage(m.from, {
-    image: fs.readFileSync('./media/toxic.jpg'),
-    caption: str,
-    contextInfo: {
-      mentionedJid: [m.sender],
-      forwardingScore: 999,
-      isForwarded: true,
-      forwardedNewsletterMessageInfo: {
-        newsletterJid: '120363398040175935@newsletter',
-        newsletterName: "ToxicMD",
-        serverMessageId: 143
-      }
+    let imageBuffer;
+    try {
+      const response = await axios.get("https://files.catbox.moe/eojuys.jpg", { responseType: "arraybuffer" });
+      imageBuffer = Buffer.from(response.data, "binary");
+    } catch (error) {
+      console.error(`Error fetching image: ${error.message}`);
+      imageBuffer = fs.readFileSync("./media/toxic.jpg"); // Fallback
     }
-  }, {
-    quoted: m
-  });
+
+    const str = `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* is LIVE, fam! 🤖
+│❒ ⏳ *Uptime*: ${timeString}
+│❒ 🔥 Keepin’ it savage!
+◈━━━━━━━━━━━━━━━━◈`;
+
+    await Matrix.sendMessage(
+      m.from,
+      {
+        image: imageBuffer,
+        caption: str,
+        contextInfo: {
+          mentionedJid: [m.sender],
+          forwardingScore: 999,
+          isForwarded: true,
+          forwardedNewsletterMessageInfo: {
+            newsletterJid: "120363398040175935@newsletter",
+            newsletterName: "Toxic-MD",
+            serverMessageId: 143,
+          },
+        },
+      },
+      { quoted: m }
+    );
+  } catch (error) {
+    console.error(`❌ Alive error: ${error.message}`);
+    await Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* hit a snag, fam! Try again! 😈
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
+  }
 };
 
 export default alive;
