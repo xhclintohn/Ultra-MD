@@ -1,4 +1,4 @@
-import pkg from '@whiskeysockets/baileys';
+import pkg from 'baileys-pro';
 const { downloadMediaMessage } = pkg;
 import config from '../config.cjs';
 
