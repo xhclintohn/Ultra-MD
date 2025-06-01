@@ -149,7 +149,7 @@ const menu = async (m, Matrix) => {
 │ 📚 *${toFancyFont("Library")}*: Baileys
 ╰─────────────
 
-> ${pushwish} *${m.pushName}*! Tap a button to select a menu:
+ ${pushwish} @*${m.pushName}*! Tap a button to select a menu category:
 
 > Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ
 `;
