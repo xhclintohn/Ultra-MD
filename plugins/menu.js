@@ -363,3 +363,74 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("menu")}*
 │ ✘ *${toFancyFont("infobot")}*
 ╰─────────────
+`;
+        break;
+
+      case "owner":
+        menuTitle = "Owner";
+        menuResponse = `
+╭─❒ 「 ${toFancyFont("Owner")} 🔒 」
+│ ✘ *${toFancyFont("join")}*
+│ ✘ *${toFancyFont("leave")}*
+│ ✘ *${toFancyFont("block")}*
+│ ✘ *${toFancyFont("unblock")}*
+│ ✘ *${toFancyFont("setppbot")}*
+│ ✘ *${toFancyFont("anticall")}*
+│ ✘ *${toFancyFont("setstatus")}*
+│ ✘ *${toFancyFont("setnamebot")}*
+│ ✘ *${toFancyFont("autotyping")}*
+│ ✘ *${toFancyFont("alwaysonline")}*
+│ ✘ *${toFancyFont("autoread")}*
+│ ✘ *${toFancyFont("autosview")}*
+╰─────────────
+`;
+        break;
+
+      case "stalk":
+        menuTitle = "Stalk";
+        menuResponse = `
+╭─❒ 「 ${toFancyFont("Stalk")} 🕵 」
+│ ✘ *${toFancyFont("truecaller")}*
+│ ✘ *${toFancyFont("instastalk")}*
+│ ✘ *${toFancyFont("githubstalk")}*
+╰─────────────
+`;
+        break;
+
+      default:
+        return;
+    }
+
+    // Format the full response
+    const fullResponse = `
+╭─❒ 「 ${toFancyFont("Toxic-MD")} - ${toFancyFont(menuTitle)} ⚠ 」
+│
+│ 🤖 *${toFancyFont("Bot")}*: ${toFancyFont("Toxic-MD")}
+│ 👤 *${toFancyFont("User")}*: ${m.pushName}
+│ 🔣 *${toFancyFont("Prefix")}*: ${prefix}
+│ 📚 *${toFancyFont("Library")}*: Baileys
+╰─────────────
+
+${menuResponse}
+
+> Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ
+`;
+
+    // Send sub-menu
+    await Matrix.sendMessage(
+      m.from,
+      {
+        image: menuImage,
+        caption: fullResponse,
+        contextInfo: {
+          mentionedJid: [m.sender],
+          forwardingScore: 999,
+          isForwarded: true,
+        },
+      },
+      { quoted: m }
+    );
+  }
+};
+
+export default menu;
