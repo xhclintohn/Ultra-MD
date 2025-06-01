@@ -1,5 +1,5 @@
 // anti-delete.js
-import pkg from '@whiskeysockets/baileys';
+import pkg from 'baileys-pro';
 const { proto, downloadContentFromMessage } = pkg;
 import config from '../config.cjs';
 import fs from 'fs';
