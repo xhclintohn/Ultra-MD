@@ -46,7 +46,7 @@ async function loadBase64Session() {
   const base64Creds = process.env.SESSION_ID;
   if (!base64Creds) {
     console.error("❌ Please add your Base64 SESSION_ID to .env!");
-    return false;
+    process.exit(1);
   }
 
   try {
@@ -56,7 +56,7 @@ async function loadBase64Session() {
     return true;
   } catch (error) {
     console.error("❌ Failed to load Base64 session:", error);
-    return false;
+    process.exit(1);
   }
 }
 
@@ -149,6 +149,8 @@ const toxicReplies = [
 
 async function start() {
   try {
+    // Load session before initializing socket
+    await loadBase64Session();
     const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
     const { version, isLatest } = await fetchLatestBaileysVersion();
     console.log(`🤖 Toxic-MD using WA v${version.join(".")}, isLatest: ${isLatest}`);
@@ -156,7 +158,6 @@ async function start() {
     const Matrix = makeWASocket({
       version,
       logger: pino({ level: "silent" }),
-      printQRInTerminal: useQR,
       browser: ["Toxic-MD", "Chrome", "1.0.0"],
       auth: state,
       getMessage: async (key) => {
@@ -168,13 +169,15 @@ async function start() {
       },
     });
 
+    let hasSentStartMessage = false;
+
     Matrix.ev.on("connection.update", async (update) => {
       const { connection, lastDisconnect } = update;
       if (connection === "close") {
         const statusCode = lastDisconnect.error?.output?.statusCode;
         switch (statusCode) {
           case DisconnectReason.badSession:
-            console.log(`⚠️ Invalid session file. Delete session and rescan QR.`);
+            console.log(`⚠️ Invalid session file. Delete session and provide new SESSION_ID.`);
             process.exit();
             break;
           case DisconnectReason.connectionClosed:
@@ -190,7 +193,7 @@ async function start() {
             process.exit();
             break;
           case DisconnectReason.loggedOut:
-            console.log(`🔒 Logged out. Delete session and rescan QR.`);
+            console.log(`🔒 Logged out. Delete session and provide new SESSION_ID.`);
             hasSentStartMessage = false;
             process.exit();
             break;
@@ -350,24 +353,8 @@ async function start() {
   }
 }
 
-async function init() {
-  if (fs.existsSync(credsPath)) {
-    console.log("🔒 Session file found, proceeding without QR code.");
-    await start();
-  } else {
-    const sessionLoaded = await loadBase64Session();
-    if (sessionLoaded) {
-      console.log("🔒 Base64 session loaded, starting bot.");
-      await start();
-    } else {
-      console.log("No session found or loaded, QR code will be printed for authentication.");
-      useQR = true;
-      await start();
-    }
-  }
-}
-
-init();
+// Start the bot directly
+start();
 
 app.get("/", (req, res) => {
   res.send("Toxic-MD is running!");
