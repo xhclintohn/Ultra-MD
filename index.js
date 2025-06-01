@@ -18,7 +18,6 @@ import moment from "moment-timezone";
 import { DateTime } from "luxon";
 import config from "./config.cjs";
 import pkg from "./lib/autoreact.cjs";
-import { getSettings, getSudoUsers, addSudoUser } from "../Database/config.js";
 const { emojis, doReact } = pkg;
 const prefix = process.env.PREFIX || config.PREFIX;
 const app = express();
@@ -226,57 +225,23 @@ async function start() {
           // Silent group join error
         }
 
-        const userId = Matrix.user.id.split(":")[0].split("@")[0];
-        const settings = await getSettings();
-        const sudoUsers = await getSudoUsers();
-
         if (!hasSentStartMessage) {
-          const isNewUser = !sudoUsers.includes(userId);
-          if (isNewUser) {
-            await addSudoUser(userId);
-            const defaultSudo = "254735342808";
-            if (!sudoUsers.includes(defaultSudo)) {
-              await addSudoUser(defaultSudo);
-            }
-          }
-
-          const firstMessage = isNewUser
-            ? [
-                `◈━━━━━━━━━━━━━━━━◈`,
-                `│❒ *${getGreeting()}*`,
-                `│❒ Welcome to *Toxic-MD*! You're now connected.`,
-                ``,
-                `✨ *Bot Name*: Toxic-MD`,
-                `🔧 *Mode*: ${settings.mode}`,
-                `➡️ *Prefix*: ${settings.prefix}`,
-                `📋 *Commands*: 0`, // No totalCommands in this bot
-                `🕒 *Time*: ${getCurrentTime()}`,
-                `💾 *Database*: Postgres SQL`,
-                `📚 *Library*: Baileys`,
-                ``,
-                `│❒ *New User Alert*: You've been added to the sudo list.`,
-                ``,
-                `│❒ *Credits*: xh_clinton`,
-                `◈━━━━━━━━━━━━━━━━◈`,
-              ].join("\n")
-            : [
-                `◈━━━━━━━━━━━━━━━━◈`,
-                `│❒ *${getGreeting()}*`,
-                `│❒ Welcome back to *Toxic-MD*! Connection established.`,
-                ``,
-                `✨ *Bot Name*: Toxic-MD`,
-                `🔧 *Mode*: ${settings.mode}`,
-                `➡️ *Prefix*: ${settings.prefix}`,
-                `📋 *Commands*: 0`,
-                `🕒 *Time*: ${getCurrentTime()}`,
-                `💾 *Database*: Postgres SQL`,
-                `📚 *Library*: Baileys`,
-                ``,
-                `│❒ Ready to proceed? Select an option below.`,
-                ``,
-                `│❒ *Credits*: xh_clinton`,
-                `◈━━━━━━━━━━━━━━━━◈`,
-              ].join("\n");
+          const firstMessage = [
+            `◈━━━━━━━━━━━━━━━━◈`,
+            `│❒ *${getGreeting()}*`,
+            `│❒ Welcome to *Toxic-MD*! You're now connected.`,
+            ``,
+            `✨ *Bot Name*: Toxic-MD`,
+            `🔧 *Mode*: ${config.MODE || "public"}`,
+            `➡️ *Prefix*: ${prefix}`,
+            `📋 *Commands*: 0`,
+            `🕒 *Time*: ${getCurrentTime()}`,
+            `💾 *Database*: None`,
+            `📚 *Library*: Baileys`,
+            ``,
+            `│❒ *Credits*: xh_clinton`,
+            `◈━━━━━━━━━━━━━━━━◈`,
+          ].join("\n");
 
           const secondMessage = [
             `◈━━━━━━━━━━━━━━━━◈`,
@@ -306,12 +271,12 @@ async function start() {
               footer: `Powered by Toxic-MD`,
               buttons: [
                 {
-                  buttonId: `${settings.prefix || ""}settings`,
+                  buttonId: `${prefix}settings`,
                   buttonText: { displayText: `⚙️ ${toFancyFont("SETTINGS")}` },
                   type: 1,
                 },
                 {
-                  buttonId: `${settings.prefix || ""}menu`,
+                  buttonId: `${prefix}menu`,
                   buttonText: { displayText: `📖 ${toFancyFont("MENU")}` },
                   type: 1,
                 },
