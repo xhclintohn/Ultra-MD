@@ -40,6 +40,7 @@
     "jimp": "^0.16.13",
     "jpeg-js": "^0.4.4",
     "jsqr": "^1.4.0",
+    "luxon": "^3.4.4",
     "libphonenumber": "^0.0.10",
     "moment-timezone": "^0.5.45",
     "node-cache": "^5.1.2",
