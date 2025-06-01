@@ -261,7 +261,7 @@ async function start() {
 
             await Matrix.sendMessage(Matrix.user.id, {
               text: secondMessage,
-              footer: `Powered by JAWAD-MD`,
+              footer: `Powered by Toxic-MD`,
               buttons: [
                 {
                   buttonId: `${prefix}menu`,
