@@ -1,47 +1,15 @@
-import moment from 'moment-timezone';
-import fs from 'fs';
-import os from 'os';
-import pkg from 'baileys-pro';
+import moment from "moment-timezone";
+import fs from "fs";
+import os from "os";
+import pkg from "baileys-pro";
 const { generateWAMessageFromContent, proto } = pkg;
-import config from '../config.cjs';
-import axios from 'axios';
+import config from "../config.cjs";
+import axios from "axios";
 
-// Get total memory and free memory in bytes
-const totalMemoryBytes = os.totalmem();
-const freeMemoryBytes = os.freemem();
-
-// Define unit conversions
-const byteToKB = 1 / 1024;
-const byteToMB = byteToKB / 1024;
-const byteToGB = byteToMB / 1024;
-
-// Function to format bytes to a human-readable format
-function formatBytes(bytes) {
-  if (bytes >= Math.pow(1024, 3)) {
-    return (bytes * byteToGB).toFixed(2) + ' GB';
-  } else if (bytes >= Math.pow(1024, 2)) {
-    return (bytes * byteToMB).toFixed(2) + ' MB';
-  } else if (bytes >= 1024) {
-    return (bytes * byteToKB).toFixed(2) + ' KB';
-  } else {
-    return bytes.toFixed(2) + ' bytes';
-  }
-}
-
-// Bot Process Time
-const uptime = process.uptime();
-const day = Math.floor(uptime / (24 * 3600)); // Calculate days
-const hours = Math.floor((uptime % (24 * 3600)) / 3600); // Calculate hours
-const minutes = Math.floor((uptime % 3600) / 60); // Calculate minutes
-const seconds = Math.floor(uptime % 60); // Calculate seconds
-
-// Uptime
-const uptimeMessage = `*I am alive now since ${day}d ${hours}h ${minutes}m ${seconds}s*`;
-const runMessage = `*☀️ ${day} Day*\n*🕐 ${hours} Hour*\n*⏰ ${minutes} Minutes*\n*⏱️ ${seconds} Seconds*\n`;
-
-const xtime = moment.tz("Asia/Colombo").format("HH:mm:ss");
-const xdate = moment.tz("Asia/Colombo").format("DD/MM/YYYY");
-const time2 = moment().tz("Asia/Colombo").format("HH:mm:ss");
+// Time logic
+const xtime = moment.tz("Africa/Nairobi").format("HH:mm:ss");
+const xdate = moment.tz("Africa/Nairobi").format("DD/MM/YYYY");
+const time2 = moment().tz("Africa/Nairobi").format("HH:mm:ss");
 let pushwish = "";
 
 if (time2 < "05:00:00") {
@@ -58,299 +26,340 @@ if (time2 < "05:00:00") {
   pushwish = `Good Night 🌌`;
 }
 
+// Fancy font utility
+function toFancyFont(text, isUpperCase = false) {
+  const fonts = {
+    A: "𝘼",
+    B: "𝘽",
+    C: "𝘾",
+    D: "𝘿",
+    E: "𝙀",
+    F: "𝙁",
+    G: "𝙂",
+    H: "𝙃",
+    I: "𝙄",
+    J: "𝙅",
+    K: "𝙆",
+    L: "𝙇",
+    M: "𝙈",
+    N: "𝙉",
+    O: "𝙊",
+    P: "𝙋",
+    Q: "𝙌",
+    R: "𝙍",
+    S: "𝙎",
+    T: "𝙏",
+    U: "𝙐",
+    V: "𝙑",
+    W: "𝙒",
+    X: "𝙓",
+    Y: "𝙔",
+    Z: "𝙕",
+    a: "𝙖",
+    b: "𝙗",
+    c: "𝙘",
+    d: "𝙙",
+    e: "𝙚",
+    f: "𝙛",
+    g: "𝙜",
+    h: "𝙝",
+    i: "𝙞",
+    j: "𝙟",
+    k: "𝙠",
+    l: "𝙡",
+    m: "𝙢",
+    n: "𝙣",
+    o: "𝙤",
+    p: "𝙥",
+    q: "𝙦",
+    r: "𝙧",
+    s: "𝙨",
+    t: "𝙩",
+    u: "𝙪",
+    v: "𝙫",
+    w: "𝙬",
+    x: "𝙭",
+    y: "𝙮",
+    z: "𝙯",
+  };
+  const formattedText = isUpperCase ? text.toUpperCase() : text.toLowerCase();
+  return formattedText
+    .split("")
+    .map((char) => fonts[char] || char)
+    .join("");
+}
+
 const menu = async (m, Matrix) => {
   const prefix = config.PREFIX;
-  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
-  const mode = config.MODE === 'public' ? 'public' : 'private';
-  const pref = config.PREFIX;
+  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+  const mode = config.MODE === "public" ? "public" : "private";
+  const totalCommands = 70; // Approximate count of all commands
 
-  const validCommands = ['list', 'help', 'menu'];
+  const validCommands = ["list", "help", "menu"];
 
   if (validCommands.includes(cmd)) {
     const mainMenu = `
-╭━━━〔 *${config.BOT_NAME}* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ Owner : *${config.OWNER_NAME}*
-┃★│ User : *${m.pushName}*
-┃★│ Baileys : *Multi Device*
-┃★│ Type : *NodeJs*
-┃★│ Mode : *${mode}*
-┃★│ Platform : *${os.platform()}*
-┃★│ Prefix : [${prefix}]
-┃★│ Version : *3.1.0*
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
+╭─❒ 「 ${toFancyFont("Toxic-MD")} Command Menu ⚠ 」
+│
+│ 🤖 *${toFancyFont("Bot")}*: ${toFancyFont("Toxic-MD")}
+│ 📋 *${toFancyFont("Total Commands")}*: ${totalCommands}
+│ 🔣 *${toFancyFont("Prefix")}*: ${prefix}
+│ 🌐 *${toFancyFont("Mode")}*: ${mode}
+│ 📚 *${toFancyFont("Library")}*: Baileys
+╰─────────────
 
-> ${pushwish} *${m.pushName}*!
+> ${pushwish} *${m.pushName}*! Reply with a number (1-9) to select a menu:
 
-╭━━〔 *Menu List* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• 1. Download Menu      
-┃◈┃• 2. Converter Menu        
-┃◈┃• 3. AI Menu  
-┃◈┃• 4. Tools Menu  
-┃◈┃• 5. Group Menu 
-┃◈┃• 6. Search Menu   
-┃◈┃• 7. Main Menu
-┃◈┃• 8. Owner Menu 
-┃◈┃• 9. Stalk Menu     
-┃◈┃• update
-┃◈└───────────┈⊷
-╰──────────────┈⊷
-> *Reply with the number (1-9)*`;
+╭─❒ 「 ${toFancyFont("MENU LIST")} 📑 」
+│ ✘ 1. *${toFancyFont("Download")}*
+│ ✘ 2. *${toFancyFont("Converter")}*
+│ ✘ 3. *${toFancyFont("AI")}*
+│ ✘ 4. *${toFancyFont("Tools")}*
+│ ✘ 5. *${toFancyFont("Group")}*
+│ ✘ 6. *${toFancyFont("Search")}*
+│ ✘ 7. *${toFancyFont("Main")}*
+│ ✘ 8. *${toFancyFont("Owner")}*
+│ ✘ 9. *${toFancyFont("Stalk")}*
+╰─────────────
 
-    // Function to get menu image
-    const getMenuImage = async () => {
-      if (config.MENU_IMAGE && config.MENU_IMAGE.trim() !== '') {
-        try {
-          const response = await axios.get(config.MENU_IMAGE, { responseType: 'arraybuffer' });
-          return Buffer.from(response.data, 'binary');
-        } catch (error) {
-          console.error('Error fetching menu image from URL, falling back to local image:', error);
-          return fs.readFileSync('./media/khan.jpg');
-        }
-      } else {
-        return fs.readFileSync('./media/khan.jpg');
-      }
-    };
+> ${toFancyFont("Powered by Toxic-MD")} 🖤 xh_clinton
+`;
 
-    const menuImage = await getMenuImage();
+    // Fetch image
+    let menuImage;
+    try {
+      const response = await axios.get("https://i.imgur.com/0YmP6yp.jpeg", { responseType: "arraybuffer" });
+      menuImage = Buffer.from(response.data, "binary");
+    } catch (error) {
+      console.error("❌ Error fetching menu image:", error);
+      return Matrix.sendMessage(m.from, { text: "Failed to load menu image." }, { quoted: m });
+    }
 
-    const sentMessage = await Matrix.sendMessage(m.from, {
-      image: menuImage,
-      caption: mainMenu,
-      contextInfo: {
-        mentionedJid: [m.sender],
-        forwardingScore: 999,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363398040175935@newsletter',
-          newsletterName: "JawadTechX",
-          serverMessageId: 143
-        }
-      }
-    }, {
-      quoted: m
-    });
+    // Send menu
+    const sentMessage = await Matrix.sendMessage(
+      m.from,
+      {
+        image: menuImage,
+        caption: mainMenu,
+        contextInfo: {
+          mentionedJid: [m.sender],
+          forwardingScore: 999,
+          isForwarded: true,
+        },
+      },
+      { quoted: m }
+    );
 
-    // Send audio after sending the menu
-    await Matrix.sendMessage(m.from, {
-      audio: { url: 'https://github.com/XdTechPro/KHAN-DATA/raw/refs/heads/main/autovoice/menunew.m4a' },
-      mimetype: 'audio/mp4',
-      ptt: true
-    }, { quoted: m });
+    // Send audio
+    await Matrix.sendMessage(
+      m.from,
+      {
+        audio: { url: "https://github.com/XdTechPro/KHAN-DATA/raw/refs/heads/main/autovoice/menunew.m4a" },
+        mimetype: "audio/mp4",
+        ptt: true,
+      },
+      { quoted: m }
+    );
 
     // Set up listener for menu selection
-    Matrix.ev.on('messages.upsert', async (event) => {
+    Matrix.ev.on("messages.upsert", async (event) => {
       const receivedMessage = event.messages[0];
       if (!receivedMessage?.message?.extendedTextMessage) return;
 
       const receivedText = receivedMessage.message.extendedTextMessage.text.trim();
       if (receivedMessage.message.extendedTextMessage.contextInfo?.stanzaId !== sentMessage.key.id) return;
 
-      let menuResponse;
       let menuTitle;
-      
+      let menuResponse;
+
       switch (receivedText) {
         case "1":
-          menuTitle = "Download Menu";
+          menuTitle = "Download";
           menuResponse = `
-╭━━〔 *Download Menu* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• apk
-┃◈┃• facebook
-┃◈┃• mediafire
-┃◈┃• pinterestdl
-┃◈┃• gitclone
-┃◈┃• gdrive
-┃◈┃• insta
-┃◈┃• ytmp3
-┃◈┃• ytmp4
-┃◈┃• play
-┃◈┃• song
-┃◈┃• video
-┃◈┃• ytmp3doc
-┃◈┃• ytmp4doc
-┃◈┃• tiktok
-┃◈└───────────┈⊷
-╰──────────────┈⊷`;
+╭─❒ 「 ${toFancyFont("Download")} 📥 」
+│ ✘ *${toFancyFont("apk")}*
+│ ✘ *${toFancyFont("facebook")}*
+│ ✘ *${toFancyFont("mediafire")}*
+│ ✘ *${toFancyFont("pinterestdl")}*
+│ ✘ *${toFancyFont("gitclone")}*
+│ ✘ *${toFancyFont("gdrive")}*
+│ ✘ *${toFancyFont("insta")}*
+│ ✘ *${toFancyFont("ytmp3")}*
+│ ✘ *${toFancyFont("ytmp4")}*
+│ ✘ *${toFancyFont("play")}*
+│ ✘ *${toFancyFont("song")}*
+│ ✘ *${toFancyFont("video")}*
+│ ✘ *${toFancyFont("ytmp3doc")}*
+│ ✘ *${toFancyFont("ytmp4doc")}*
+│ ✘ *${toFancyFont("tiktok")}*
+╰─────────────
+`;
           break;
-          
+
         case "2":
-          menuTitle = "Converter Menu";
+          menuTitle = "Converter";
           menuResponse = `
-╭━━〔 *Converter Menu* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• attp
-┃◈┃• attp2
-┃◈┃• attp3
-┃◈┃• ebinary
-┃◈┃• dbinary
-┃◈┃• emojimix
-┃◈┃• mp3
-┃◈└───────────┈⊷
-╰──────────────┈⊷`;
+╭─❒ 「 ${toFancyFont("Converter")} 🔄 」
+│ ✘ *${toFancyFont("attp")}*
+│ ✘ *${toFancyFont("attp2")}*
+│ ✘ *${toFancyFont("attp3")}*
+│ ✘ *${toFancyFont("ebinary")}*
+│ ✘ *${toFancyFont("dbinary")}*
+│ ✘ *${toFancyFont("emojimix")}*
+│ ✘ *${toFancyFont("mp3")}*
+╰─────────────
+`;
           break;
-          
+
         case "3":
-          menuTitle = "AI Menu";
+          menuTitle = "AI";
           menuResponse = `
-╭━━〔 *AI Menu* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• ai
-┃◈┃• bug
-┃◈┃• report
-┃◈┃• gpt
-┃◈┃• dalle
-┃◈┃• remini
-┃◈┃• gemini
-┃◈└───────────┈⊷
-╰──────────────┈⊷`;
+╭─❒ 「 ${toFancyFont("AI")} 🤖 」
+│ ✘ *${toFancyFont("ai")}*
+│ ✘ *${toFancyFont("bug")}*
+│ ✘ *${toFancyFont("report")}*
+│ ✘ *${toFancyFont("gpt")}*
+│ ✘ *${toFancyFont("dalle")}*
+│ ✘ *${toFancyFont("remini")}*
+│ ✘ *${toFancyFont("gemini")}*
+╰─────────────
+`;
           break;
-          
+
         case "4":
-          menuTitle = "Tools Menu";
+          menuTitle = "Tools";
           menuResponse = `
-╭━━〔 *Tools Menu* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• calculator
-┃◈┃• tempmail
-┃◈┃• checkmail
-┃◈┃• trt
-┃◈┃• tts
-┃◈└───────────┈⊷
-╰──────────────┈⊷`;
+╭─❒ 「 ${toFancyFont("Tools")} 🛠 」
+│ ✘ *${toFancyFont("calculator")}*
+│ ✘ *${toFancyFont("tempmail")}*
+│ ✘ *${toFancyFont("checkmail")}*
+│ ✘ *${toFancyFont("trt")}*
+│ ✘ *${toFancyFont("tts")}*
+╰─────────────
+`;
           break;
-          
+
         case "5":
-          menuTitle = "Group Menu";
+          menuTitle = "Group";
           menuResponse = `
-╭━━〔 *Group Menu* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• linkgroup
-┃◈┃• setppgc
-┃◈┃• setname
-┃◈┃• setdesc
-┃◈┃• group
-┃◈┃• gcsetting
-┃◈┃• welcome
-┃◈┃• add
-┃◈┃• kick
-┃◈┃• hidetag
-┃◈┃• tagall
-┃◈┃• antilink
-┃◈┃• antitoxic
-┃◈┃• promote
-┃◈┃• demote
-┃◈┃• getbio
-┃◈└───────────┈⊷
-╰──────────────┈⊷`;
+╭─❒ 「 ${toFancyFont("Group")} 👥 」
+│ ✘ *${toFancyFont("linkgroup")}*
+│ ✘ *${toFancyFont("setppgc")}*
+│ ✘ *${toFancyFont("setname")}*
+│ ✘ *${toFancyFont("setdesc")}*
+│ ✘ *${toFancyFont("group")}*
+│ ✘ *${toFancyFont("gcsetting")}*
+│ ✘ *${toFancyFont("welcome")}*
+│ ✘ *${toFancyFont("add")}*
+│ ✘ *${toFancyFont("kick")}*
+│ ✘ *${toFancyFont("hidetag")}*
+│ ✘ *${toFancyFont("tagall")}*
+│ ✘ *${toFancyFont("antilink")}*
+│ ✘ *${toFancyFont("antitoxic")}*
+│ ✘ *${toFancyFont("promote")}*
+│ ✘ *${toFancyFont("demote")}*
+│ ✘ *${toFancyFont("getbio")}*
+╰─────────────
+`;
           break;
-          
+
         case "6":
-          menuTitle = "Search Menu";
+          menuTitle = "Search";
           menuResponse = `
-╭━━〔 *Search Menu* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• play
-┃◈┃• yts
-┃◈┃• imdb
-┃◈┃• google
-┃◈┃• gimage
-┃◈┃• pinterest
-┃◈┃• wallpaper
-┃◈┃• wikimedia
-┃◈┃• ytsearch
-┃◈┃• ringtone
-┃◈┃• lyrics
-┃◈└───────────┈⊷
-╰──────────────┈⊷`;
+╭─❒ 「 ${toFancyFont("Search")} 🔍 」
+│ ✘ *${toFancyFont("play")}*
+│ ✘ *${toFancyFont("yts")}*
+│ ✘ *${toFancyFont("imdb")}*
+│ ✘ *${toFancyFont("google")}*
+│ ✘ *${toFancyFont("gimage")}*
+│ ✘ *${toFancyFont("pinterest")}*
+│ ✘ *${toFancyFont("wallpaper")}*
+│ ✘ *${toFancyFont("wikimedia")}*
+│ ✘ *${toFancyFont("ytsearch")}*
+│ ✘ *${toFancyFont("ringtone")}*
+│ ✘ *${toFancyFont("lyrics")}*
+╰─────────────
+`;
           break;
-          
+
         case "7":
-          menuTitle = "Main Menu";
+          menuTitle = "Main";
           menuResponse = `
-╭━━〔 *Main Menu* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• ping
-┃◈┃• alive
-┃◈┃• owner
-┃◈┃• menu
-┃◈┃• infobot
-┃◈└───────────┈⊷
-╰──────────────┈⊷`;
+╭─❒ 「 ${toFancyFont("Main")} ⚙ 」
+│ ✘ *${toFancyFont("ping")}*
+│ ✘ *${toFancyFont("alive")}*
+│ ✘ *${toFancyFont("owner")}*
+│ ✘ *${toFancyFont("menu")}*
+│ ✘ *${toFancyFont("infobot")}*
+╰─────────────
+`;
           break;
-          
+
         case "8":
-          menuTitle = "Owner Menu";
+          menuTitle = "Owner";
           menuResponse = `
-╭━━〔 *Owner Menu* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• join
-┃◈┃• leave
-┃◈┃• block
-┃◈┃• unblock
-┃◈┃• setppbot
-┃◈┃• anticall
-┃◈┃• setstatus
-┃◈┃• setnamebot
-┃◈┃• autotyping
-┃◈┃• alwaysonline
-┃◈┃• autoread
-┃◈┃• autosview
-┃◈└───────────┈⊷
-╰──────────────┈⊷`;
+╭─❒ 「 ${toFancyFont("Owner")} 🔒 」
+│ ✘ *${toFancyFont("join")}*
+│ ✘ *${toFancyFont("leave")}*
+│ ✘ *${toFancyFont("block")}*
+│ ✘ *${toFancyFont("unblock")}*
+│ ✘ *${toFancyFont("setppbot")}*
+│ ✘ *${toFancyFont("anticall")}*
+│ ✘ *${toFancyFont("setstatus")}*
+│ ✘ *${toFancyFont("setnamebot")}*
+│ ✘ *${toFancyFont("autotyping")}*
+│ ✘ *${toFancyFont("alwaysonline")}*
+│ ✘ *${toFancyFont("autoread")}*
+│ ✘ *${toFancyFont("autosview")}*
+╰─────────────
+`;
           break;
-          
+
         case "9":
-          menuTitle = "Stalk Menu";
+          menuTitle = "Stalk";
           menuResponse = `
-╭━━〔 *Stalk Menu* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• truecaller
-┃◈┃• instastalk
-┃◈┃• githubstalk
-┃◈└───────────┈⊷
-╰──────────────┈⊷`;
+╭─❒ 「 ${toFancyFont("Stalk")} 🕵 」
+│ ✘ *${toFancyFont("truecaller")}*
+│ ✘ *${toFancyFont("instastalk")}*
+│ ✘ *${toFancyFont("githubstalk")}*
+╰─────────────
+`;
           break;
-          
+
         default:
           menuTitle = "Invalid Choice";
-          menuResponse = "*Invalid Reply Please Reply With A Number Between 1 to 9*";
+          menuResponse = `*${toFancyFont("Invalid Reply")}* Please reply with a number between 1 to 9`;
       }
 
-      // Format the full response with title and description
+      // Format the full response
       const fullResponse = `
-╭━━━〔 *${config.BOT_NAME} - ${menuTitle}* 〕━━━┈⊷
-┃★╭──────────────
-┃★│• Owner : *${config.OWNER_NAME}*
-┃★│• User : *${m.pushName}*
-┃★│• Prefix : [${prefix}]
-┃★│• Version : *3.1.0*
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
+╭─❒ 「 ${toFancyFont("Toxic-MD")} - ${toFancyFont(menuTitle)} ⚠ 」
+│
+│ 🤖 *${toFancyFont("Bot")}*: ${toFancyFont("Toxic-MD")}
+│ 👤 *${toFancyFont("User")}*: ${m.pushName}
+│ 🔣 *${toFancyFont("Prefix")}*: ${prefix}
+│ 📚 *${toFancyFont("Library")}*: Baileys
+╰─────────────
 
 ${menuResponse}
 
-> *${config.DESCRIPTION}*`;
+> ${toFancyFont("Powered by Toxic-MD")} 🖤 xh_clinton
+`;
 
-      // Send the response with image and context info
-      await Matrix.sendMessage(m.from, {
-        image: menuImage,
-        caption: fullResponse,
-        contextInfo: {
-          mentionedJid: [m.sender],
-          forwardingScore: 999,
-          isForwarded: true,
-          forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363398040175935@newsletter',
-            newsletterName: "JawadTechX",
-            serverMessageId: 143
-          }
-        }
-      }, {
-        quoted: receivedMessage
-      });
+      // Send response
+      await Matrix.sendMessage(
+        m.from,
+        {
+          image: menuImage,
+          caption: fullResponse,
+          contextInfo: {
+            mentionedJid: [m.sender],
+            forwardingScore: 999,
+            isForwarded: true,
+          },
+        },
+        { quoted: receivedMessage }
+      );
     });
   }
 };
