@@ -152,7 +152,7 @@ async function start() {
     await loadBase64Session();
     const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
     const { version, isLatest } = await fetchLatestBaileysVersion();
-    console.log(`🤖 Toxix-MD using WA v${version.join(".")}, isLatest: ${isLatest}`);
+    console.log(`🤖 Toxic-MD using WA v${version.join(".")}, isLatest: ${isLatest}`);
 
     const Matrix = makeWASocket({
       version,
