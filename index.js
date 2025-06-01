@@ -152,12 +152,12 @@ async function start() {
     await loadBase64Session();
     const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
     const { version, isLatest } = await fetchLatestBaileysVersion();
-    console.log(`🤖 JAWAD-MD using WA v${version.join(".")}, isLatest: ${isLatest}`);
+    console.log(`🤖 Toxix-MD using WA v${version.join(".")}, isLatest: ${isLatest}`);
 
     const Matrix = makeWASocket({
       version,
       logger: pino({ level: "silent" }),
-      browser: ["JAWAD-MD", "Chrome", "1.0.0"],
+      browser: ["Toxic-MD", "Chrome", "1.0.0"],
       auth: state,
       getMessage: async (key) => {
         if (store) {
@@ -222,9 +222,9 @@ async function start() {
           const firstMessage = [
             `◈━━━━━━━━━━━━━━━━◈`,
             `│❒ *${getGreeting()}*`,
-            `│❒ Welcome to *JAWAD-MD*! You're now connected.`,
+            `│❒ Welcome to *Toxic-MD*! You're now connected.`,
             ``,
-            `✨ *Bot Name*: JAWAD-MD`,
+            `✨ *Bot Name*: Toxic-MD`,
             `🔧 *Mode*: ${config.MODE || "public"}`,
             `➡️ *Prefix*: ${prefix}`,
             `📋 *Commands*: 0`,
@@ -245,12 +245,12 @@ async function start() {
           try {
             await Matrix.sendMessage(Matrix.user.id, {
               text: firstMessage,
-              footer: `Powered by JAWAD-MD`,
+              footer: `Powered by Toxic-MD`,
               viewOnce: true,
               contextInfo: {
                 externalAdReply: {
                   showAdAttribution: false,
-                  title: "JAWAD-MD",
+                  title: "Toxic-MD",
                   body: `Bot initialized successfully.`,
                   sourceUrl: `https://github.com/xhclintohn/Toxic-MD`,
                   mediaType: 1,
@@ -274,7 +274,7 @@ async function start() {
               contextInfo: {
                 externalAdReply: {
                   showAdAttribution: false,
-                  title: "JAWAD-MD",
+                  title: "Toxic-MD",
                   body: `Select to proceed.`,
                   sourceUrl: `https://github.com/xhclintohn/Toxic-MD`,
                   mediaType: 1,
@@ -289,7 +289,7 @@ async function start() {
           hasSentStartMessage = true;
         }
 
-        console.log(chalk.green(`✅ Connection established. JAWAD-MD is operational.`));
+        console.log(chalk.green(`✅ Connection established. Toxic-MD is operational.`));
       }
     });
 
@@ -350,7 +350,7 @@ async function start() {
 start();
 
 app.get("/", (req, res) => {
-  res.send("JAWAD-MD is running!");
+  res.send("Toxic-MD is running!");
 });
 
 app.listen(PORT, () => {
