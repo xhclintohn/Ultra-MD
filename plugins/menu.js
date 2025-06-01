@@ -89,19 +89,28 @@ function toFancyFont(text, isUpperCase = false) {
     .join("");
 }
 
-// Retry utility
-async function fetchImageWithRetry(url, retries = 3, delay = 2000) {
-  for (let i = 0; i < retries; i++) {
+// Image fetch utility
+async function fetchMenuImage() {
+  const primaryUrl = "https://files.catbox.moe/y2utve.jpg";
+  const fallbackUrl = "https://files.catbox.moe/9kL5x9Q.jpg";
+  for (let i = 0; i < 3; i++) {
     try {
-      const response = await axios.get(url, { responseType: "arraybuffer" });
+      const response = await axios.get(primaryUrl, { responseType: "arraybuffer" });
       return Buffer.from(response.data, "binary");
     } catch (error) {
-      if (error.response?.status === 429 && i < retries - 1) {
-        console.log(`Rate limit hit, retrying in ${delay}ms...`);
-        await new Promise((resolve) => setTimeout(resolve, delay));
+      if (error.response?.status === 429 && i < 2) {
+        console.log(`Rate limit hit, retrying in 2s...`);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         continue;
       }
-      throw error;
+      console.error("❌ Failed to fetch primary image:", error);
+      try {
+        const response = await axios.get(fallbackUrl, { responseType: "arraybuffer" });
+        return Buffer.from(response.data, "binary");
+      } catch (fallbackError) {
+        console.error("❌ Failed to fetch fallback image:", fallbackError);
+        return null;
+      }
     }
   }
 }
@@ -125,6 +134,9 @@ const menu = async (m, Matrix) => {
     "stalk",
   ];
 
+  // Fetch image for all cases
+  const menuImage = await fetchMenuImage();
+
   // Handle main menu
   if (validCommands.includes(cmd)) {
     const mainMenu = `
@@ -142,89 +154,72 @@ const menu = async (m, Matrix) => {
 > Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ
 `;
 
-    // Fetch image with retry
-    let menuImage;
-    const primaryUrl = "https://files.catbox.moe/y2utve.jpg";
-    const fallbackUrl = "https://files.catbox.moe/9kL5x9Q.jpg";
-    try {
-      menuImage = await fetchImageWithRetry(primaryUrl);
-    } catch (error) {
-      console.error("❌ Failed to fetch primary image:", error);
-      try {
-        menuImage = await fetchImageWithRetry(fallbackUrl);
-      } catch (fallbackError) {
-        console.error("❌ Failed to fetch fallback image:", fallbackError);
-        await Matrix.sendMessage(m.from, { text: mainMenu }, { quoted: m });
-        return Matrix.sendMessage(m.from, {
-          audio: { url: "https://files.catbox.moe/59g7ny.mp4" },
-          mimetype: "audio/mp4",
-          ptt: true,
-        }, { quoted: m });
-      }
-    }
-
-    // Send menu with buttons
-    await Matrix.sendMessage(
-      m.from,
-      {
-        image: menuImage,
-        caption: mainMenu,
-        viewOnce: true,
-        buttons: [
-          {
-            buttonId: `${prefix}download`,
-            buttonText: { displayText: `📥 ${toFancyFont("Download")}` },
-            type: 1,
-          },
-          {
-            buttonId: `${prefix}converter`,
-            buttonText: { displayText: `🔄 ${toFancyFont("Converter")}` },
-            type: 1,
-          },
-          {
-            buttonId: `${prefix}ai`,
-            buttonText: { displayText: `🤖 ${toFancyFont("AI")}` },
-            type: 1,
-          },
-          {
-            buttonId: `${prefix}tools`,
-            buttonText: { displayText: `🛠 ${toFancyFont("Tools")}` },
-            type: 1,
-          },
-          {
-            buttonId: `${prefix}group`,
-            buttonText: { displayText: `👥 ${toFancyFont("Group")}` },
-            type: 1,
-          },
-          {
-            buttonId: `${prefix}search`,
-            buttonText: { displayText: `🔍 ${toFancyFont("Search")}` },
-            type: 1,
-          },
-          {
-            buttonId: `${prefix}main`,
-            buttonText: { displayText: `⚙ ${toFancyFont("Main")}` },
-            type: 1,
-          },
-          {
-            buttonId: `${prefix}owner`,
-            buttonText: { displayText: `🔒 ${toFancyFont("Owner")}` },
-            type: 1,
-          },
-          {
-            buttonId: `${prefix}stalk`,
-            buttonText: { displayText: `🕵 ${toFancyFont("Stalk")}` },
-            type: 1,
-          },
-        ],
-        contextInfo: {
-          mentionedJid: [m.sender],
-          forwardingScore: 999,
-          isForwarded: true,
+    const messageOptions = {
+      viewOnce: true,
+      buttons: [
+        {
+          buttonId: `${prefix}download`,
+          buttonText: { displayText: `📥 ${toFancyFont("Download")}` },
+          type: 1,
         },
+        {
+          buttonId: `${prefix}converter`,
+          buttonText: { displayText: `🔄 ${toFancyFont("Converter")}` },
+          type: 1,
+        },
+        {
+          buttonId: `${prefix}ai`,
+          buttonText: { displayText: `🤖 ${toFancyFont("AI")}` },
+          type: 1,
+        },
+        {
+          buttonId: `${prefix}tools`,
+          buttonText: { displayText: `🛠 ${toFancyFont("Tools")}` },
+          type: 1,
+        },
+        {
+          buttonId: `${prefix}group`,
+          buttonText: { displayText: `👥 ${toFancyFont("Group")}` },
+          type: 1,
+        },
+        {
+          buttonId: `${prefix}search`,
+          buttonText: { displayText: `🔍 ${toFancyFont("Search")}` },
+          type: 1,
+        },
+        {
+          buttonId: `${prefix}main`,
+          buttonText: { displayText: `⚙ ${toFancyFont("Main")}` },
+          type: 1,
+        },
+        {
+          buttonId: `${prefix}owner`,
+          buttonText: { displayText: `🔒 ${toFancyFont("Owner")}` },
+          type: 1,
+        },
+        {
+          buttonId: `${prefix}stalk`,
+          buttonText: { displayText: `🕵 ${toFancyFont("Stalk")}` },
+          type: 1,
+        },
+      ],
+      contextInfo: {
+        mentionedJid: [m.sender],
+        forwardingScore: 999,
+        isForwarded: true,
       },
-      { quoted: m }
-    );
+    };
+
+    // Send menu with or without image
+    if (menuImage) {
+      await Matrix.sendMessage(
+        m.from,
+        { image: menuImage, caption: mainMenu, ...messageOptions },
+        { quoted: m }
+      );
+    } else {
+      await Matrix.sendMessage(m.from, { text: mainMenu, ...messageOptions }, { quoted: m });
+    }
 
     // Send audio
     await Matrix.sendMessage(
@@ -251,7 +246,7 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("apk")}*
 │ ✘ *${toFancyFont("facebook")}*
 │ ✘ *${toFancyFont("mediafire")}*
-│ ✘ *${toFancyFont("pinterestdl")}*
+│ ✘ *${toFancyFont("pinters")}*
 │ ✘ *${toFancyFont("gitclone")}*
 │ ✘ *${toFancyFont("gdrive")}*
 │ ✘ *${toFancyFont("insta")}*
@@ -416,20 +411,24 @@ ${menuResponse}
 > Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ
 `;
 
-    // Send sub-menu
-    await Matrix.sendMessage(
-      m.from,
-      {
-        image: menuImage,
-        caption: fullResponse,
-        contextInfo: {
-          mentionedJid: [m.sender],
-          forwardingScore: 999,
-          isForwarded: true,
+    // Send sub-menu with or without image
+    if (menuImage) {
+      await Matrix.sendMessage(
+        m.from,
+        {
+          image: menuImage,
+          caption: fullResponse,
+          contextInfo: {
+            mentionedJid: [m.sender],
+            forwardingScore: 999,
+            isForwarded: true,
+          },
         },
-      },
-      { quoted: m }
-    );
+        { quoted: m }
+      );
+    } else {
+      await Matrix.sendMessage(m.from, { text: fullResponse }, { quoted: m });
+    }
   }
 };
 
