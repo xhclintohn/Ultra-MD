@@ -128,7 +128,7 @@ const menu = async (m, Matrix) => {
     // Fetch image
     let menuImage;
     try {
-      const response = await axios.get("https://i.imgur.com/0YmP6yp.jpeg", { responseType: "arraybuffer" });
+      const response = await axios.get("https://files.catbox.moe/y2utve.jpg", { responseType: "arraybuffer" });
       menuImage = Buffer.from(response.data, "binary");
     } catch (error) {
       console.error("❌ Error fetching menu image:", error);
@@ -154,7 +154,7 @@ const menu = async (m, Matrix) => {
     await Matrix.sendMessage(
       m.from,
       {
-        audio: { url: "https://github.com/XdTechPro/KHAN-DATA/raw/refs/heads/main/autovoice/menunew.m4a" },
+        audio: { url: "https://files.catbox.moe/59g7ny.mp4" },
         mimetype: "audio/mp4",
         ptt: true,
       },
