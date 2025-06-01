@@ -1,4 +1,4 @@
-import { downloadMediaMessage } from '@whiskeysockets/baileys';
+import { downloadMediaMessage } from 'baileys-pro';
 import Jimp from 'jimp';
 import config from '../config.cjs';
 
