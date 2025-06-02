@@ -2,28 +2,29 @@ services:
   - type: web
     name: Toxic-MD
     env: node
-    plan: free # Upgrade to paid for more uptime, fam! 😎
-    branch: main # Your GitHub branch, change if needed
-    repo: https://github.com/xhclint/Toxic-MD # Update to your actual repo
-    buildCommand: npm install # Installs axios, baileys-pro, etc.
-    startCommand: node index.js # Starts your bot
-    autoDeploy: true # Auto-deploys on git push
-    healthCheckPath: /health # Optional: add a health endpoint in index.js
+    plan: free
+    branch: main
+    repo: https://github.com/xhclint/Toxic-MD
+    buildCommand: npm install
+    startCommand: node index.js
+    autoDeploy: true
+    healthCheckPath: /health
+    associateExisting: true  # Hypothetical flag to auto-associate (check Render docs)
     envVars:
       - key: NODE_VERSION
-        value: 18.x # Stable Node.js version for Toxic-MD
+        value: 18.x
       - key: SESSION_ID
-        sync: false # Set this in Render Dashboard (get from pairing code or qr scan)
+        value: "your-session-id"  # Predefine to skip manual input
         description: 🔐 Your bot’s secret key. Scan the QR code to get this or Toxic-MD won’t start! 😤
       - key: OWNER_NUMBER
-        value: 254735342808 # Your number, no +
+        value: 254735342808
         description: 📱 Your WhatsApp number (with country code, no +). Who’s runnin’ this show? 💪
       - key: OWNER_NAME
-        value: Toxic-Master # Your name, boss
+        value: Toxic-Master
         description: 👑 Your name, the king of Toxic-MD. Flex it in credits! 😎
       - key: PREFIX
-        value: . # Command trigger
+        value: .
         description: 🔠 Command trigger (e.g., . for !ping). Keep it short or look like a clown! 🤡
       - key: GITHUB_TOKEN
-        sync: false # Set in Render Dashboard for repo.js, githubstalk.js
+        value: "your-github-token"  # Predefine to skip manual input
         description: 🔑 GitHub token for API calls (repo stats, etc.). Get it from GitHub or repo.js will choke! 😈
