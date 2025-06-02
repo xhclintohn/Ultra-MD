@@ -1,80 +1,97 @@
-import axios from 'axios';
-import config from '../config.cjs';
+import axios from "axios";
+import config from "../config.js";
 
-const githubStalk = async (m, gss) => {
+const githubStalk = async (m, Matrix) => {
   try {
-    const prefix = config.PREFIX;
-const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
-const text = m.body.slice(prefix.length + cmd.length).trim();
-    const args = text.split(' ');
+    const prefix = config.Prefix || config.PREFIX || ".";
+    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+    const text = m.body.slice(prefix.length + cmd.length).trim();
+    const args = text.split(" ");
 
-    const validCommands = ['githubstalk', 'ghstalk'];
+    if (!["githubstalk", "ghstalk"].includes(cmd)) return;
 
-   if (validCommands.includes(cmd)) {
-      if (!args[0]) return m.reply('Mention a GitHub username to stalk.');
-
-      const username = args[0];
-
-      try {
-        // Fetch GitHub user data using Axios
-        const githubResponse = await axios.get(`https://api.github.com/users/${username}`);
-        const userData = githubResponse.data;
-
-        if (githubResponse.status !== 200) {
-          return m.reply(`❌ GitHub user not found.`);
-        }
-
-        // Construct the response message
-        let responseMessage = `🌟 *GitHub Profile - @${userData.login}*\n\n`;
-        responseMessage += `  ◦  *Name*: ${userData.name || 'N/A'}\n`;
-        responseMessage += `  ◦  *Username*: @${userData.login}\n`;
-        responseMessage += `  ◦  *Bio*: ${userData.bio || 'N/A'}\n`;
-        responseMessage += `  ◦  *ID*: ${userData.id}\n`;
-        responseMessage += `  ◦  *Node ID*: ${userData.node_id}\n`;
-        responseMessage += `  ◦  *Profile URL*: ${userData.avatar_url}\n`;
-        responseMessage += `  ◦  *GitHub URL*: ${userData.html_url}\n`;
-        responseMessage += `  ◦  *Type*: ${userData.type}\n`;
-        responseMessage += `  ◦  *Admin*: ${userData.site_admin ? 'Yes' : 'No'}\n`;
-        responseMessage += `  ◦  *Company*: ${userData.company || 'N/A'}\n`;
-        responseMessage += `  ◦  *Blog*: ${userData.blog || 'N/A'}\n`;
-        responseMessage += `  ◦  *Location*: ${userData.location || 'N/A'}\n`;
-        responseMessage += `  ◦  *Email*: ${userData.email || 'N/A'}\n`;
-        responseMessage += `  ◦  *Public Repositories*: ${userData.public_repos}\n`;
-        responseMessage += `  ◦  *Public Gists*: ${userData.public_gists}\n`;
-        responseMessage += `  ◦  *Followers*: ${userData.followers}\n`;
-        responseMessage += `  ◦  *Following*: ${userData.following}\n`;
-        responseMessage += `  ◦  *Created At*: ${userData.created_at}\n`;
-        responseMessage += `  ◦  *Updated At*: ${userData.updated_at}\n`;
-
-        const githubReposResponse = await axios.get(`https://api.github.com/users/${username}/repos?per_page=5&sort=stargazers_count&direction=desc`);
-        const reposData = githubReposResponse.data;
-
-        if (reposData.length > 0) {
-          const topRepos = reposData.slice(0, 5); // Display the top 5 starred repositories
-
-          const reposList = topRepos.map(repo => {
-            return `  ◦  *Repository*: [${repo.name}](${repo.html_url})
-  ◦  *Description*: ${repo.description || 'N/A'}
-  ◦  *Stars*: ${repo.stargazers_count}
-  ◦  *Forks*: ${repo.forks}`;
-          });
-
-          const reposCaption = `📚 *Top Starred Repositories*\n\n${reposList.join('\n\n')}`;
-          responseMessage += `\n\n${reposCaption}`;
-        } else {
-          responseMessage += `\n\nNo public repositories found.`;
-        }
-
-        // Send the message with the updated caption and user's avatar
-        await gss.sendMessage(m.from, { image: { url: userData.avatar_url }, caption: responseMessage }, { quoted: m });
-      } catch (error) {
-        console.error('Error fetching GitHub data:', error);
-        await gss.sendMessage(m.from, 'An error occurred while fetching GitHub data.', { quoted: m });
-      }
+    if (!args[0]) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+│❒ Yo, dumbass, gimme a *GitHub username* to stalk! Don’t waste *Toxic-MD*’s time! 😤💾
+│❒ Ex: *${prefix}ghstalk octocat*
+◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
+      }, { quoted: m });
     }
+
+    const username = args[0].replace("@", "");
+    await Matrix.sendMessage(m.from, { react: { text: "⏳", key: m.key } });
+
+    // GitHub API headers (optional token for higher rate limits)
+    const headers = {
+      Accept: "application/vnd.github.v3+json",
+      ...(config.GITHUB_TOKEN ? { Authorization: `token ${config.GITHUB_TOKEN}` } : {}),
+    };
+
+    // Fetch user data
+    const githubResponse = await axios.get(`https://api.github.com/users/${username}`, { headers });
+    const userData = githubResponse.data;
+
+    if (githubResponse.status !== 200 || !userData.login) {
+      await Matrix.sendMessage(m.from, { react: { text: "❌", key: m.key } });
+      return Matrix.sendMessage(m.from, {
+        text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+│❒ *Toxic-MD* can’t find that GitHub user, fam! Check the username, clown! 🤡
+◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
+      }, { quoted: m });
+    }
+
+    // Construct user profile response
+    let responseMessage = `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+│❒ *Toxic-MD* GitHub Stalk 🖥️
+│❒ 👤 *Username*: @${userData.login}
+│❒ 📛 *Name*: ${userData.name || "N/A"}
+│❒ 📝 *Bio*: ${userData.bio || "N/A"}
+│❒ 🌍 *Location*: ${userData.location || "N/A"}
+│❒ 💼 *Company*: ${userData.company || "N/A"}
+│❒ 🌐 *Blog*: ${userData.blog || "N/A"}
+│❒ 📧 *Email*: ${userData.email || "N/A"}
+│❒ 📊 *Public Repos*: ${userData.public_repos || 0}
+│❒ 📜 *Public Gists*: ${userData.public_gists || 0}
+│❒ 👥 *Followers*: ${userData.followers || 0}
+│❒ ➡️ *Following*: ${userData.following || 0}
+│❒ 🕒 *Created*: ${new Date(userData.created_at).toLocaleDateString()}
+│❒ 🔗 *Profile*: ${userData.html_url}`;
+
+    // Fetch top 5 starred repos
+    const githubReposResponse = await axios.get(`https://api.github.com/users/${username}/repos?per_page=5&sort=stars&direction=desc`, { headers });
+    const reposData = githubReposResponse.data;
+
+    if (reposData.length > 0) {
+      const reposList = reposData.map((repo) => {
+        return `│❒ 📂 *${repo.name}*
+│❒   🔗 ${repo.html_url}
+│❒   📝 ${repo.description || "No description"}
+│❒   ⭐ *Stars*: ${repo.stargazers_count || 0}
+│❒   🍴 *Forks*: ${repo.forks_count || 0}`;
+      });
+      responseMessage += `\n\n│❒ 📚 *Top Starred Repos*\n${reposList.join("\n")}`;
+    } else {
+      responseMessage += `\n\n│❒ 📚 *Top Starred Repos*: None found, fam! 😣`;
+    }
+
+    responseMessage += `\n◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`;
+
+    // Send with avatar
+    await Matrix.sendMessage(m.from, {
+      image: { url: userData.avatar_url },
+      caption: responseMessage,
+    }, { quoted: m });
+
+    await Matrix.sendMessage(m.from, { react: { text: "✅", key: m.key } });
   } catch (error) {
-    console.error('Error processing the command:', error);
-    m.reply('An error occurred while processing the command.');
+    console.error(`❌ GitHubStalk error: ${error.message}`);
+    await Matrix.sendMessage(m.from, { react: { text: "❌", key: m.key } });
+    await Matrix.sendMessage(m.from, {
+      text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+│❒ *Toxic-MD* fucked up stalkin’ that user, fam! Try again or check the name! 😈
+◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
+    }, { quoted: m });
   }
 };
 
