@@ -106,7 +106,7 @@ const update = async (m, Matrix) => {
 ◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`);
 
     // Replace files, skip configs
-    const sourcePath = path.join(extractPath, "Toxic-MD-main");
+    const sourcePath = path.join(extractPath, "Ultra-MD-main");
     await copyFolderSync(sourcePath, process.cwd(), ["package.json", "config.cjs", ".env", "node_modules"]);
 
     // Update package.json with new commit hash
