@@ -6,7 +6,7 @@
   "stack": "container",
   "env": {
     "SESSION_ID": {
-      "description": "🔐 Your bot’s secret key. Scan the QR code to get this or *Toxic-MD* won’t start! 😤",
+      "description": "🔐 Your bot’s secret key. Use Pairing code or qr to get this or *Toxic-MD* won’t start! 😤",
       "required": true,
       "value": ""
     },
