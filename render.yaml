@@ -13,7 +13,7 @@ services:
       - key: NODE_VERSION
         value: 18.x # Stable Node.js version for Toxic-MD
       - key: SESSION_ID
-        sync: false # Set this in Render Dashboard (get from QR scan)
+        sync: false # Set this in Render Dashboard (get from pairing code or qr scan)
         description: 🔐 Your bot’s secret key. Scan the QR code to get this or Toxic-MD won’t start! 😤
       - key: OWNER_NUMBER
         value: 254735342808 # Your number, no +
