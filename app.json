@@ -1,119 +1,34 @@
 {
   "name": "Toxic-MD ☣️",
-  "description": "⚡ A high-performance WhatsApp Multi-Device Bot built with Node.js for enhanced messaging automation.",
-  "logo": "𝐱𝐡_𝐜𝐥𝐢𝐧𝐭𝐨𝐧",
-  "keywords": ["Toxic-MD", "WhatsApp Bot", "Multi-Device"],
-  "repository": "https://github.com/xhclintohn/Ultra-MD",
+  "description": "⚡ A savage WhatsApp bot built to dominate chats with toxic style! Powered by Node.js for max chaos.",
+  "keywords": ["Toxic-MD", "WhatsApp Bot", "Multi-Device", "Savage"],
+  "repository": "https://github.com/Toxic-Master/Toxic-MD",
   "stack": "container",
   "env": {
     "SESSION_ID": {
-      "description": "🔐 Session ID (Required for bot authentication | Obtain from your session file)",
+      "description": "🔐 Your bot’s secret key. Scan the QR code to get this or *Toxic-MD* won’t start! 😤",
       "required": true,
       "value": ""
     },
-    "MODE": {
-      "description": "🌍 Bot Mode: 'public' (open for all) or 'self' (private use only)",
-      "required": true,
-      "value": "public"
-    },
-    "BOT_NAME": {
-      "description": "🤖 Customize the bot's display name (Default: Toxic-MD)",
-      "required": false,
-      "value": "Toxic-MD ☣️"
-    },
-    "MENU_IMAGE": {
-      "description": "🖼️ Custom menu image URL (Keep blank for default)",
-      "required": false,
-      "value": "https://i.ibb.co/7JcYBD5Y/cbb9f804644ae8c4.jpg"
-    },
-    "DESCRIPTION": {
-      "description": "📌 Bot description/caption (Appears in menus & replies)",
-      "required": false,
-      "value": "⚡ Powered by Toxic-MD"
-    },
-    "ANTI_DELETE": {
-      "description": "🚫 Anti-delete: Set chat path (Use 'inbox' for same chat)",
-      "required": true,
-      "value": "inbox"
-    },
-    "ANTI_DELETE_PATH": {
-      "description": "⚙️ Enable anti-delete? (true/false)",
-      "required": true,
-      "value": "true"
-    },
-    "AUTO_STATUS_SEEN": {
-      "description": "👀 Auto-view status updates? (true/false)",
-      "required": false,
-      "value": "true"
-    },
-    "AUTO_STATUS_REPLY": {
-      "description": "💬 Auto-reply after viewing status? (true/false)",
-      "required": false,
-      "value": "false"
-    },
-    "STATUS_READ_MSG": {
-      "description": "📝 Status reply message (if AUTO_STATUS_REPLY=true)",
-      "required": false,
-      "value": "Toxic-MD ☣️ | Status Seen ✅"
-    },
-    "OWNER_NAME": {
-      "description": "👑 Bot owner's name (for credits/display)",
-      "required": false,
-      "value": "𝐱𝐡_𝐜𝐥𝐢𝐧𝐭𝐨𝐧"
-    },
     "OWNER_NUMBER": {
-      "description": "📱 Owner's WhatsApp number (with country code)",
-      "required": false,
+      "description": "📱 Your WhatsApp number (with country code, no +). Who’s runnin’ this show? 💪",
+      "required": true,
       "value": "254735342808"
     },
-    "AUTO_READ": {
-      "description": "📨 Auto-read incoming messages? (true/false)",
-      "required": false,
-      "value": "false"
-    },
-    "AUTO_TYPING": {
-      "description": "⌨️ Show typing indicator? (true/false)",
-      "required": false,
-      "value": "false"
-    },
-    "AUTO_RECORDING": {
-      "description": "🎤 Show audio recording indicator? (true/false)",
-      "required": false,
-      "value": "false"
-    },
-    "ALWAYS_ONLINE": {
-      "description": "🟢 Keep bot online 24/7? (true/false)",
-      "required": false,
-      "value": "false"
-    },
-    "AUTO_BLOCK": {
-      "description": "⛔ Auto-block +212 (Morocco) numbers? (true/false)",
-      "required": false,
-      "value": "false"
-    },
-    "REJECT_CALL": {
-      "description": "📞 Auto-reject incoming calls? (true/false)",
-      "required": false,
-      "value": "false"
+    "OWNER_NAME": {
+      "description": "👑 Your name, the boss of *Toxic-MD*. Flex it in the bot’s credits! 😎",
+      "required": true,
+      "value": "Toxic-Master"
     },
     "PREFIX": {
-      "description": "🔠 Command prefix (Default: '.')",
-      "required": false,
+      "description": "🔠 Command trigger (e.g., ‘.’ for !ping). Keep it short or look like a clown! 🤡",
+      "required": true,
       "value": "."
     }
   },
   "buildpacks": [
     {
       "url": "heroku/nodejs"
-    },
-    {
-      "url": "https://github.com/DuckyTeam/heroku-buildpack-imagemagick.git"
-    },
-    {
-      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest"
-    },
-    {
-      "url": "https://github.com/clhuang/heroku-buildpack-webp-binaries.git"
     }
   ]
 }
