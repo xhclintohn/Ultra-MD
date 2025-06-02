@@ -1,29 +1,12 @@
 services:
   - type: web
-    name: Toxic-MD
-    env: node
+    name: bot-wa
+    env: docker
+    region: Singapore
     plan: free
-    branch: main
-    repo: https://github.com/xhclint/Toxic-MD
-    buildCommand: npm install
-    startCommand: node index.js
-    autoDeploy: true
-    healthCheckPath: /health
+    repo: https://github.com/xhclintohn/Toxic-Md 
+    autoDeploy: true 
     envVars:
-      - key: NODE_VERSION
-        value: 18.x
       - key: SESSION_ID
-        value: "your-session-id"  # Replace with your actual session ID
-        description: 🔐 Your bot’s secret key. Scan the QR code to get this or Toxic-MD won’t start! 😤
-      - key: OWNER_NUMBER
-        value: 254735342808
-        description: 📱 Your WhatsApp number (with country code, no +). Who’s runnin’ this show? 💪
-      - key: OWNER_NAME
-        value: Toxic-Master
-        description: 👑 Your name, the king of Toxic-MD. Flex it in credits! 😎
-      - key: PREFIX
-        value: .
-        description: 🔠 Command trigger (e.g., . for !ping). Keep it short or look like a clown! 🤡
-      - key: GITHUB_TOKEN
-        value: "your-github-token"  # Replace with your actual GitHub token
-        description: 🔑 GitHub token for API calls (repo stats, etc.). Get it from GitHub or repo.js will choke! 😈
+        sync: false  # Requires manual input in the Render Dashboard
+        description: 🔐 Your bot’s session ID. Scan the QR code to get this or the bot won’t start!
