@@ -8,35 +8,42 @@ const repo = async (m, Matrix) => {
 
     if (!["repo", "sc", "script", "info"].includes(cmd)) return;
 
-    const githubRepoURL = "https://github.com/xhclintohn/Toxic-MD";
+    await Matrix.sendMessage(m.from, { react: { text: "⏳", key: m.key } });
 
-    // Extract username and repo name
+    const githubRepoURL = "https://github.com/xhclintohn/Toxic-MD";
     const [, username, repoName] = githubRepoURL.match(/github\.com\/([^/]+)\/([^/]+)/) || [];
+
     if (!username || !repoName) {
       throw new Error("Invalid GitHub URL format.");
     }
 
+    // GitHub API headers (optional token for higher rate limits)
+    const headers = {
+      Accept: "application/vnd.github.v3+json",
+      ...(config.GITHUB_TOKEN ? { Authorization: `token ${config.GITHUB_TOKEN}` } : {}),
+    };
+
     // Fetch repo details
-    const response = await axios.get(`https://api.github.com/repos/${username}/${repoName}`);
+    const response = await axios.get(`https://api.github.com/repos/${username}/${repoName}`, { headers });
     const repoData = response.data;
 
-    if (!repoData) {
-      throw new Error("GitHub API request failed.");
+    if (response.status !== 200 || !repoData.full_name) {
+      throw new Error("GitHub API request failed or repo not found.");
     }
 
     // Format repo info
-    const formattedInfo = `◈━━━━━━━━━━━━━━━━◈
-│❒ *Toxic-MD* Repo Stats 🌟
+    const formattedInfo = `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+│❒ *Toxic-MD* Repo Stats 📊
 │❒ 📛 *Bot*: ${repoData.name}
-│❒ 👑 *Owner*: ${repoData.owner.login}
-│❒ ⭐ *Stars*: ${repoData.stargazers_count}
-│❒ 🍴 *Forks*: ${repoData.forks_count}
+│❒ 👑 *Owner*: ${repoData.owner?.login || "N/A"}
+│❒ ⭐ *Stars*: ${repoData.stargazers_count || 0}
+│❒ 🍴 *Forks*: ${repoData.forks_count || 0}
 │❒ 🔗 *Link*: ${repoData.html_url}
 │❒ 📝 *Description*: ${repoData.description || "No description"}
+│❒ 🕒 *Created*: ${new Date(repoData.created_at).toLocaleDateString()}
 │❒ 💥 Star & fork it, fam!
-◈━━━━━━━━━━━━━━━━◈
-│❒ Powered By *Toxic-MD* 🖤
-◈━━━━━━━━━━━━━━━━◈`;
+│❒ 🖤 *Powered By Toxic-MD*
+◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`;
 
     // Send image with caption
     await Matrix.sendMessage(
@@ -44,25 +51,18 @@ const repo = async (m, Matrix) => {
       {
         image: { url: "https://files.catbox.moe/juroe8.jpg" },
         caption: formattedInfo,
-        contextInfo: {
-          mentionedJid: [m.sender],
-          forwardingScore: 999,
-          isForwarded: true,
-          forwardedNewsletterMessageInfo: {
-            newsletterJid: "120363322461279856@newsletter",
-            newsletterName: "ToxicTech",
-            serverMessageId: 143,
-          },
-        },
       },
       { quoted: m }
     );
+
+    await Matrix.sendMessage(m.from, { react: { text: "✅", key: m.key } });
   } catch (error) {
     console.error(`❌ Repo error: ${error.message}`);
     await Matrix.sendMessage(m.from, {
-      text: `◈━━━━━━━━━━━━━━━━◈
-│❒ *Toxic-MD* hit a snag fetchin’ repo info, fam! Try again! 😈
-◈━━━━━━━━━━━━━━━━◈`,
+      react: { text: "❌", key: m.key },
+      text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+│❒ *Toxic-MD* fucked up fetchin’ repo stats, fam! Check the URL or try again! 😈
+◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
     }, { quoted: m });
   }
 };
