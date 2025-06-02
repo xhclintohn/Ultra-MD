@@ -1,27 +1,54 @@
-import config from '../config.cjs';
+import config from "../config.js";
 
-const block = async (m, gss) => {
+const block = async (m, Matrix) => {
   try {
-    const botNumber = await gss.decodeJid(gss.user.id);
-  const isCreator = [botNumber, config.OWNER_NUMBER + '@s.whatsapp.net'].includes(m.sender);
-    const prefix = config.PREFIX;
-const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
-const text = m.body.slice(prefix.length + cmd.length).trim();
+    const botNumber = await Matrix.decodeJid(Matrix.user.id);
+    const isCreator = [botNumber, config.OWNER_NUMBER + "@s.whatsapp.net"].includes(m.sender);
+    const prefix = config.Prefix || config.PREFIX || ".";
+    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+    const text = m.body.slice(prefix.length + cmd.length).trim();
 
-    const validCommands = ['block'];
+    if (cmd !== "block") return;
 
-    if (!validCommands.includes(cmd)) return;
-    
-    if (!isCreator) return m.reply("*📛 THIS IS AN OWNER COMMAND*");
+    if (!isCreator) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ Piss off, wannabe! Only *Toxic-MD*’s boss can throw blocks! 😤🔪
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
+    }
 
-    let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
-    
-    await gss.updateBlockStatus(users, 'block')
-      .then((res) => m.reply(`Blocked ${users.split('@')[0]} successfully.`))
-      .catch((err) => m.reply(`Failed to block user: ${err}`));
+    let users = m.mentionedJid[0] || (m.quoted ? m.quoted.sender : null) || (text.replace(/[^0-9]/g, "") + "@s.whatsapp.net");
+    if (!users || users === botNumber) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ Yo, dumbass, tag, quote, or drop a number to block! Don’t make *Toxic-MD* block itself, idiot! 😆
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
+    }
+
+    if (users === m.sender) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ What, you tryna block yourself? *Toxic-MD* ain’t here for your clown shit! 🤡
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
+    }
+
+    await Matrix.updateBlockStatus(users, "block");
+    await Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* yeeted @${users.split("@")[0]} into the void! Blocked, fam! 🚫💥
+◈━━━━━━━━━━━━━━━━◈`,
+      contextInfo: { mentionedJid: [users] },
+    }, { quoted: m });
   } catch (error) {
-    console.error('Error:', error);
-    m.reply('An error occurred while processing the command.');
+    console.error(`❌ Block error: ${error.message}`);
+    await Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* fucked up blockin’ that loser, fam! Try again! 😈
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   }
 };
 
