@@ -1,36 +1,68 @@
-import config from '../config.cjs';
+import fs from "fs";
+import config from "../config.cjs";
 
-// Main command function
-const anticallCommand = async (m, Matrix) => {
-  const botNumber = await Matrix.decodeJid(Matrix.user.id);
-  const isCreator = [botNumber, config.OWNER_NUMBER + '@s.whatsapp.net'].includes(m.sender);
-  const prefix = config.PREFIX;
-const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
-const text = m.body.slice(prefix.length + cmd.length).trim();
-  
-  const validCommands = ['autostatusreply'];
+const autostatusreplyCommand = async (m, Matrix) => {
+  try {
+    const botNumber = await Matrix.decodeJid(Matrix.user.id);
+    const isCreator = [botNumber, config.OWNER_NUMBER + "@s.whatsapp.net"].includes(m.sender);
+    const prefix = config.Prefix || config.PREFIX || ".";
+    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+    const text = m.body.slice(prefix.length + cmd.length).trim().toLowerCase();
 
- if (validCommands.includes(cmd)){
-   if (!isCreator) return m.reply("*📛 THIS IS AN OWNER COMMAND*");
-    let responseMessage;
+    if (cmd !== "autostatusreply") return;
 
-    if (text === 'on') {
-      config.AUTO_STATUS_REPLY = true;
-      responseMessage = "AUTO STATUS REPLY has been enabled.";
-    } else if (text === 'off') {
-      config.AUTO_STATUS_REPLY = false;
-      responseMessage = "AUTO STATUS REPLY has been disabled.";
-    } else {
-      responseMessage = `Usage:\n- *${prefix + cmd} ON:* Enable AUTO STATUS REPLY\n- *${prefix + cmd} off:* Disable AUTO STATUS REPLY`;
+    if (!isCreator) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+│❒ Get lost, poser! Only *Toxic-MD*’s boss can fuck with status replies! 😤🔪
+◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
+      }, { quoted: m });
     }
+
+    if (!text) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+│❒ Yo, braindead, tell *Toxic-MD* *on* or *off*! Don’t just stare! 😆
+│❒ Ex: *${prefix}autostatusreply on*
+◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
+      }, { quoted: m });
+    }
+
+    if (!["on", "off"] includes(text)) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+│❒ What’s this garbage? *Toxic-MD* only takes *on* or *off*, clown! 🤡
+│❒ Ex: *${prefix}autostatusreply on*
+◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
+      }, { quoted: m });
+    }
+
+    config.AUTO_STATUS_REPLY = text === "on";
 
     try {
-      await Matrix.sendMessage(m.from, { text: responseMessage }, { quoted: m });
+      fs.writeFileSync("./config.cjs", `module.exports = ${JSON.stringify(config, null, 2)};`);
     } catch (error) {
-      console.error("Error processing your request:", error);
-      await Matrix.sendMessage(m.from, { text: 'Error processing your request.' }, { quoted: m });
+      console.error(`Error saving config.cjs`): ${error.message}`;
+      return Matrix.sendMessage(m.from, {
+        text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+│❒ *Toxic-MD* choked tryin’ to save that, fam! Server’s trash! 😣
+◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
+      }, { quoted: m });
     }
+
+    await Matrix.sendMessage(m.from, {
+      text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+│❒ *Toxic-MD* auto-status reply flipped to *${text}*! You’re runnin’ this, boss! 💪🔥
+◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
+    }, { quoted: m });
+  } catch (error) {
+    console.error(`❌ Autostatusreply error: ${error.message}`);
+    await Matrix.sendMessage(m.from, {
+      text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+│❒ *Toxic-MD* screwed up somewhere, fam! Hit it again! 😈
+◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
+    }, { quoted: m });
   }
 };
 
-export default anticallCommand;
+export default autostatusreplyCommand;
