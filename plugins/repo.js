@@ -65,7 +65,7 @@ const repo = async (m, Matrix) => {
     await Matrix.sendMessage(
       m.from,
       {
-        image: { url: "https://files.catbox.moe/juroe8.jpg" },
+        image: { url: "https://files.catbox.moe/y2utve.jpg" },
         caption: replyText,
       },
       { quoted: m }
