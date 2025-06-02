@@ -9,7 +9,7 @@ services:
     startCommand: node index.js
     autoDeploy: true
     healthCheckPath: /health
-    associateExisting: true  # Hypothetical flag to auto-associate (check Render docs)
+    associateExisting: true 
     envVars:
       - key: NODE_VERSION
         value: 18.x
