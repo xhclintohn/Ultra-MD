@@ -33,7 +33,7 @@ const repo = async (m, Matrix) => {
 
     await Matrix.sendMessage(m.from, { react: { text: "⏳", key: m.key } });
 
-    const repoUrl = "https://api.github.com/repos/Toxic-Master/Toxic-MD";
+    const repoUrl = "https://api.github.com/repos/xhclintohn/Toxic-MD";
     const headers = {
       Accept: "application/vnd.github.v3+json",
       ...(config.GITHUB_TOKEN ? { Authorization: `token ${config.GITHUB_TOKEN}` } : {}),
