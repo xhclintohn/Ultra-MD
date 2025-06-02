@@ -10,7 +10,18 @@ import axios from "axios";
 const xtime = moment.tz("Africa/Nairobi").format("HH:mm:ss");
 const xdate = moment.tz("Africa/Nairobi").format("DD/MM/YYYY");
 const time2 = moment().tz("Africa/Nairobi").format("HH:mm:ss");
-let pushwish*${toFancyFont("Good Night 🌌");
+let pushwish = "";
+
+if (time2 < "05:00:00") {
+  pushwish = `Good Morning 🌄`;
+} else if (time2 < "11:00:00") {
+  pushwish = `Good Morning 🌄`;
+} else if (time2 < "15:00:00") {
+  pushwish = `Good Afternoon 🌅`;
+} else if (time2 < "18:00:00") {
+  pushwish = `Good Evening 🌃`;
+} else if (time2 < "19:00:00") {
+  pushwish = `Good Evening 🌃`;
 } else {
   pushwish = `Good Night 🌌`;
 }
@@ -393,7 +404,7 @@ const menu = async (m, Matrix) => {
 
 ${menuResponse}
 
-> Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ
+> Pσɯҽ Macau Tσxιƈ-ɱԃȥ
 `;
 
     // Send sub-menu with or without image
