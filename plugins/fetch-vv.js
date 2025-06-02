@@ -1,5 +1,5 @@
 import { downloadMediaMessage } from "baileys-pro";
-import config from "../config.js";
+import config from "../config.cjs";
 
 const OwnerCmd = async (m, Matrix) => {
   try {
