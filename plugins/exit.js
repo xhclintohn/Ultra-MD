@@ -1,4 +1,4 @@
-import config from "../config.js";
+import config from "../config.cjs";
 
 const leaveGroup = async (m, Matrix) => {
   try {
