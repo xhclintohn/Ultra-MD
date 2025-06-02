@@ -10,18 +10,7 @@ import axios from "axios";
 const xtime = moment.tz("Africa/Nairobi").format("HH:mm:ss");
 const xdate = moment.tz("Africa/Nairobi").format("DD/MM/YYYY");
 const time2 = moment().tz("Africa/Nairobi").format("HH:mm:ss");
-let pushwish = "";
-
-if (time2 < "05:00:00") {
-  pushwish = `Good Morning 🌄`;
-} else if (time2 < "11:00:00") {
-  pushwish = `Good Morning 🌄`;
-} else if (time2 < "15:00:00") {
-  pushwish = `Good Afternoon 🌅`;
-} else if (time2 < "18:00:00") {
-  pushwish = `Good Evening 🌃`;
-} else if (time2 < "19:00:00") {
-  pushwish = `Good Evening 🌃`;
+let pushwish*${toFancyFont("Good Night 🌌");
 } else {
   pushwish = `Good Night 🌌`;
 }
@@ -123,15 +112,15 @@ const menu = async (m, Matrix) => {
 
   const validCommands = ["list", "help", "menu"];
   const subMenuCommands = [
-    "download",
-    "converter",
-    "ai",
-    "tools",
-    "group",
-    "search",
-    "main",
-    "owner",
-    "stalk",
+    "download-menu",
+    "converter-menu",
+    "ai-menu",
+    "tools-menu",
+    "group-menu",
+    "search-menu",
+    "main-menu",
+    "owner-menu",
+    "stalk-menu",
   ];
 
   // Fetch image for all cases
@@ -158,47 +147,47 @@ const menu = async (m, Matrix) => {
       viewOnce: true,
       buttons: [
         {
-          buttonId: `${prefix}download`,
+          buttonId: `${prefix}download-menu`,
           buttonText: { displayText: `📥 ${toFancyFont("Download")}` },
           type: 1,
         },
         {
-          buttonId: `${prefix}converter`,
+          buttonId: `${prefix}converter-menu`,
           buttonText: { displayText: `🔄 ${toFancyFont("Converter")}` },
           type: 1,
         },
         {
-          buttonId: `${prefix}ai`,
+          buttonId: `${prefix}ai-menu`,
           buttonText: { displayText: `🤖 ${toFancyFont("AI")}` },
           type: 1,
         },
         {
-          buttonId: `${prefix}tools`,
+          buttonId: `${prefix}tools-menu`,
           buttonText: { displayText: `🛠 ${toFancyFont("Tools")}` },
           type: 1,
         },
         {
-          buttonId: `${prefix}group`,
+          buttonId: `${prefix}group-menu`,
           buttonText: { displayText: `👥 ${toFancyFont("Group")}` },
           type: 1,
         },
         {
-          buttonId: `${prefix}search`,
+          buttonId: `${prefix}search-menu`,
           buttonText: { displayText: `🔍 ${toFancyFont("Search")}` },
           type: 1,
         },
         {
-          buttonId: `${prefix}main`,
+          buttonId: `${prefix}main-menu`,
           buttonText: { displayText: `⚙ ${toFancyFont("Main")}` },
           type: 1,
         },
         {
-          buttonId: `${prefix}owner`,
+          buttonId: `${prefix}owner-menu`,
           buttonText: { displayText: `🔒 ${toFancyFont("Owner")}` },
           type: 1,
         },
         {
-          buttonId: `${prefix}stalk`,
+          buttonId: `${prefix}stalk-menu`,
           buttonText: { displayText: `🕵 ${toFancyFont("Stalk")}` },
           type: 1,
         },
@@ -221,14 +210,10 @@ const menu = async (m, Matrix) => {
       await Matrix.sendMessage(m.from, { text: mainMenu, ...messageOptions }, { quoted: m });
     }
 
-    // Send audio
+    // Send audio as a voice note
     await Matrix.sendMessage(
       m.from,
-      {
-        audio: { url: "https://files.catbox.moe/59g7ny.mp4" },
-        mimetype: "audio/mp4",
-        ptt: true,
-      },
+      { audio: { url: "https://files.catbox.moe/f4zaz4.mp3" }, mimetype: "audio/mp4", ptt: true },
       { quoted: m }
     );
   }
@@ -239,7 +224,7 @@ const menu = async (m, Matrix) => {
     let menuResponse;
 
     switch (cmd) {
-      case "download":
+      case "download-menu":
         menuTitle = "Download";
         menuResponse = `
 ╭─❒ 「 ${toFancyFont("Download")} 📥 」
@@ -262,7 +247,7 @@ const menu = async (m, Matrix) => {
 `;
         break;
 
-      case "converter":
+      case "converter-menu":
         menuTitle = "Converter";
         menuResponse = `
 ╭─❒ 「 ${toFancyFont("Converter")} 🔄 」
@@ -277,7 +262,7 @@ const menu = async (m, Matrix) => {
 `;
         break;
 
-      case "ai":
+      case "ai-menu":
         menuTitle = "AI";
         menuResponse = `
 ╭─❒ 「 ${toFancyFont("AI")} 🤖 」
@@ -292,7 +277,7 @@ const menu = async (m, Matrix) => {
 `;
         break;
 
-      case "tools":
+      case "tools-menu":
         menuTitle = "Tools";
         menuResponse = `
 ╭─❒ 「 ${toFancyFont("Tools")} 🛠 」
@@ -305,7 +290,7 @@ const menu = async (m, Matrix) => {
 `;
         break;
 
-      case "group":
+      case "group-menu":
         menuTitle = "Group";
         menuResponse = `
 ╭─❒ 「 ${toFancyFont("Group")} 👥 」
@@ -329,7 +314,7 @@ const menu = async (m, Matrix) => {
 `;
         break;
 
-      case "search":
+      case "search-menu":
         menuTitle = "Search";
         menuResponse = `
 ╭─❒ 「 ${toFancyFont("Search")} 🔍 」
@@ -348,7 +333,7 @@ const menu = async (m, Matrix) => {
 `;
         break;
 
-      case "main":
+      case "main-menu":
         menuTitle = "Main";
         menuResponse = `
 ╭─❒ 「 ${toFancyFont("Main")} ⚙ 」
@@ -361,7 +346,7 @@ const menu = async (m, Matrix) => {
 `;
         break;
 
-      case "owner":
+      case "owner-menu":
         menuTitle = "Owner";
         menuResponse = `
 ╭─❒ 「 ${toFancyFont("Owner")} 🔒 」
@@ -381,7 +366,7 @@ const menu = async (m, Matrix) => {
 `;
         break;
 
-      case "stalk":
+      case "stalk-menu":
         menuTitle = "Stalk";
         menuResponse = `
 ╭─❒ 「 ${toFancyFont("Stalk")} 🕵 」
