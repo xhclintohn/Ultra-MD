@@ -1,86 +1,158 @@
-import cron from 'node-cron';
-import moment from 'moment-timezone';
-import config from '../config.cjs';
+import cron from "node-cron";
+import moment from "moment-timezone";
+import config from "../config.js";
 
 let scheduledTasks = {};
 
-const groupSetting = async (m, gss) => {
+const groupSetting = async (m, Matrix) => {
   try {
-    const prefix = config.PREFIX;
-const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
-const text = m.body.slice(prefix.length + cmd.length).trim();
+    const prefix = config.Prefix || config.PREFIX || ".";
+    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+    const text = m.body.slice(prefix.length + cmd.length).trim();
 
-    const validCommands = ['group'];
+    const validCommands = ["group"];
     if (!validCommands.includes(cmd)) return;
 
-    if (!m.isGroup) return m.reply("*📛 THIS COMMAND CAN ONLY BE USED IN GROUPS*");
-    const groupMetadata = await gss.groupMetadata(m.from);
+    if (!m.isGroup) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ Yo, dumbass, *Toxic-MD* only runs this in groups! Get with it! 😤🏠
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
+    }
+
+    const groupMetadata = await Matrix.groupMetadata(m.from);
     const participants = groupMetadata.participants;
-    const botNumber = await gss.decodeJid(gss.user.id);
-    const botAdmin = participants.find(p => p.id === botNumber)?.admin;
-    const senderAdmin = participants.find(p => p.id === m.sender)?.admin;
+    const botNumber = await Matrix.decodeJid(Matrix.user.id);
+    const botAdmin = participants.find((p) => p.id === botNumber)?.admin;
+    const senderAdmin = participants.find((p) => p.id === m.sender)?.admin;
 
-    if (!botAdmin) return m.reply("*📛 BOT MUST BE AN ADMIN TO USE THIS COMMAND*");
-    if (!senderAdmin) return m.reply("*📛 YOU MUST BE AN ADMIN TO USE THIS COMMAND*");
+    if (!botAdmin) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* ain’t got admin juice to run this! Promote me, scrub! 😡🔧
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
+    }
 
-    const args = m.body.slice(prefix.length + cmd.length).trim().split(/\s+/);
-    if (args.length < 1) return m.reply(`Please specify a setting (open/close) and optionally a time.\n\nExample:\n*${prefix + cmd} open* or *${prefix + cmd} open 04:00 PM*`);
+    if (!senderAdmin) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ You ain’t no admin, fam! Step up or shut up! 😎🔪
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
+    }
 
-    const groupSetting = args[0].toLowerCase();
-    const time = args.slice(1).join(' ');
+    const args = text.split(/\s+/);
+    if (args.length < 1) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ Yo, braindead, tell *Toxic-MD* what to do! Use *open*/*unmute* or *close*/*mute* [time]! 😆
+│❒ Ex: *${prefix}group open* or *${prefix}group close 16:00*
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
+    }
 
-    // Handle immediate setting if no time is provided
+    let groupSetting = args[0].toLowerCase();
+    const time = args.slice(1).join(" ");
+
+    // Map aliases
+    if (groupSetting === "mute") groupSetting = "close";
+    if (groupSetting === "unmute") groupSetting = "open";
+
+    // Handle immediate setting
     if (!time) {
-      if (groupSetting === 'close') {
-        await gss.groupSettingUpdate(m.from, 'announcement');
-        return m.reply("Group successfully closed.");
-      } else if (groupSetting === 'open') {
-        await gss.groupSettingUpdate(m.from, 'not_announcement');
-        return m.reply("Group successfully opened.");
+      if (groupSetting === "close") {
+        await Matrix.groupSettingUpdate(m.from, "announcement");
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* locked this group down tight! No chatter, fam! 🔒💥
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
+      } else if (groupSetting === "open") {
+        await Matrix.groupSettingUpdate(m.from, "not_announcement");
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* flung the gates open! Talk your shit, fam! 🗣️🔥
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
       } else {
-        return m.reply(`Invalid setting. Use "open" to open the group and "close" to close the group.\n\nExample:\n*${prefix + cmd} open* or *${prefix + cmd} close*`);
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ What’s this trash? *Toxic-MD* only takes *open*/*unmute* or *close*/*mute*, clown! 🤡
+│❒ Ex: *${prefix}group open* or *${prefix}group close 16:00*
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
       }
     }
 
-    // Check if the provided time is valid
-    if (!/^\d{1,2}:\d{2}\s*(?:AM|PM)$/i.test(time)) {
-      return m.reply(`Invalid time format. Use HH:mm AM/PM format.\n\nExample:\n*${prefix + cmd} open 04:00 PM*`);
+    // Validate time format
+    if (!/^\d{1,2}:\d{2}\s*$/i.test(time)) {
+      return Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ That time’s garbage, fam! Use HH:mm format, like *16:00*! 😣
+│❒ Ex: *${prefix}group open 16:00*
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
     }
 
-    // Convert time to 24-hour format
-    const [hour, minute] = moment(time, ['h:mm A', 'hh:mm A']).format('HH:mm').split(':').map(Number);
+    // Convert time to cron (24-hour)
+    const [hour, minute] = moment(time, ["H:mm", "HH:mm"]).format("HH:mm").split(":").map(Number);
     const cronTime = `${minute} ${hour} * * *`;
 
-    console.log(`Scheduling ${groupSetting} at ${cronTime} IST`);
+    console.log(`Scheduling ${groupSetting} at ${cronTime} EAT`);
 
-    // Clear any existing scheduled task for this group
+    // Clear existing task
     if (scheduledTasks[m.from]) {
       scheduledTasks[m.from].stop();
       delete scheduledTasks[m.from];
     }
 
-    scheduledTasks[m.from] = cron.schedule(cronTime, async () => {
-      try {
-        console.log(`Executing scheduled task for ${groupSetting} at ${moment().format('HH:mm')} IST`);
-        if (groupSetting === 'close') {
-          await gss.groupSettingUpdate(m.from, 'announcement');
-          await gss.sendMessage(m.from, { text: "Group successfully closed." });
-        } else if (groupSetting === 'open') {
-          await gss.groupSettingUpdate(m.from, 'not_announcement');
-          await gss.sendMessage(m.from, { text: "Group successfully opened." });
+    // Schedule new task
+    scheduledTasks[m.from] = cron.schedule(
+      cronTime,
+      async () => {
+        try {
+          console.log(`Executing ${groupSetting} at ${moment().format("HH:mm")} EAT`);
+          if (groupSetting === "close") {
+            await Matrix.groupSettingUpdate(m.from, "announcement");
+            await Matrix.sendMessage(m.from, {
+              text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* shut this group down! Quiet time, fam! 🔒💥
+◈━━━━━━━━━━━━━━━━◈`,
+            });
+          } else if (groupSetting === "open") {
+            await Matrix.groupSettingUpdate(m.from, "not_announcement");
+            await Matrix.sendMessage(m.from, {
+              text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* opened the floodgates! Let’s get loud, fam! 🗣️🔥
+◈━━━━━━━━━━━━━━━━◈`,
+            });
+          }
+        } catch (err) {
+          console.error("Scheduled task error:", err);
+          await Matrix.sendMessage(m.from, {
+            text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* fucked up the schedule, fam! Somethin’s busted! 😈
+◈━━━━━━━━━━━━━━━━◈`,
+          });
         }
-      } catch (err) {
-        console.error('Error during scheduled task execution:', err);
-        await gss.sendMessage(m.from, { text: 'An error occurred while updating the group setting.' });
-      }
-    }, {
-      timezone: "Asia/Kolkata"
-    });
+      },
+      { timezone: "Africa/Nairobi" }
+    );
 
-    m.reply(`Group will be set to "${groupSetting}" at ${time} IST.`);
+    await Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* set to ${groupSetting === "close" ? "lock" : "open"} *${groupMetadata.subject}* at *${time}* EAT! You’re runnin’ this, boss! 💪🔥
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   } catch (error) {
-    console.error('Error:', error);
-    m.reply('An error occurred while processing the command.');
+    console.error(`❌ Group error: ${error.message}`);
+    await Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* screwed up somewhere, fam! Try that again! 😈
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   }
 };
 
