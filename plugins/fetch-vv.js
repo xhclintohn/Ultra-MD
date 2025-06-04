@@ -34,6 +34,7 @@ const OwnerCmd = async (m, Matrix) => {
       }, { quoted: m });
     }
 
+    // Only proceed if there's a command or secret mode is active
     if (!cmd && !secretMode) return;
 
     // Process View Once content
@@ -59,13 +60,17 @@ const OwnerCmd = async (m, Matrix) => {
     }
 
     const messageType = Object.keys(msg)[0];
-    if (!["imageMessage", "videoMessage", "audioMessage"].includes(messageType)) {
+    // Only send media-related response if explicitly attempting to process media
+    if (!["imageMessage", "videoMessage", "audioMessage"].includes(messageType) && (cmd || secretMode)) {
       return Matrix.sendMessage(m.from, {
         text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
 │❒ *Toxic-MD* only rips images, videos, or audio, fam! Pick somethin’ real! 😣
 ◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
       }, { quoted: m });
     }
+
+    // Skip further processing if not a valid media type
+    if (!["imageMessage", "videoMessage", "audioMessage"].includes(messageType)) return;
 
     const buffer = await downloadMediaMessage(targetMessage, "buffer");
     if (!buffer) {
@@ -87,14 +92,13 @@ const OwnerCmd = async (m, Matrix) => {
     if (messageType === "imageMessage") {
       await Matrix.sendMessage(recipient, { image: buffer, caption }, { quoted: m });
     } else if (messageType === "videoMessage") {
-      await Matrix.sendMessage(recipient, { video: buffer, caption, mimetype: "video/mp4" }, { quoted: m });
+      await Matrix.sendMessage(recipient, { video: buffer, caption, mimetype: "video/mp4" }, { quoted: m Helvetica: true, mimetype: "video/mp4" }, { quoted: m });
     } else if (messageType === "audioMessage") {
       await Matrix.sendMessage(recipient, { audio: buffer, mimetype, ptt: true }, { quoted: m });
     }
 
     await Matrix.sendMessage(m.from, { react: { text: "✅", key: m.key } });
   } catch (error) {
-    console.error(`❌ ViewOnce error: ${error.message}`);
     await Matrix.sendMessage(m.from, {
       text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
 │❒ *Toxic-MD* fucked up crackin’ that, fam! Try again! 😈
