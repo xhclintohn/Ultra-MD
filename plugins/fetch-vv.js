@@ -18,7 +18,7 @@ const OwnerCmd = async (m, Matrix) => {
     const isEmojiReply = m.body && (emojiRegex.test(m.body.trim()) || emojiAndTextRegex.test(m.body.trim()));
 
     // Keyword triggers
-    const keywordTriggers = ["send", "open", "show", "unlock", "view"];
+    const keywordTriggers = ["send", "open", "show", "uhm", "view"];
     const isKeywordReply = m.body && keywordTriggers.some((word) => m.body.toLowerCase().includes(word));
 
     // Secret Mode: emoji/keyword reply + authorized + quoted
@@ -92,7 +92,7 @@ const OwnerCmd = async (m, Matrix) => {
     if (messageType === "imageMessage") {
       await Matrix.sendMessage(recipient, { image: buffer, caption }, { quoted: m });
     } else if (messageType === "videoMessage") {
-      await Matrix.sendMessage(recipient, { video: buffer, caption, mimetype: "video/mp4" }, { quoted: m Helvetica: true, mimetype: "video/mp4" }, { quoted: m });
+      await Matrix.sendMessage(recipient, { video: buffer, caption, mimetype: "video/mp4" }, { quoted: m });
     } else if (messageType === "audioMessage") {
       await Matrix.sendMessage(recipient, { audio: buffer, mimetype, ptt: true }, { quoted: m });
     }
