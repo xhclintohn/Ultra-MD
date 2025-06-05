@@ -2,46 +2,59 @@ import axios from "axios";
 import config from "../config.cjs";
 
 const instagram = async (m, Matrix) => {
-  const prefix = config.PREFIX;
+  const prefix = config.Prefix || config.PREFIX || ".";
   const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
   const query = m.body.slice(prefix.length + cmd.length).trim();
 
   if (!["ig", "insta", "instagram"].includes(cmd)) return;
 
   if (!query || !query.startsWith("http")) {
-    return Matrix.sendMessage(m.from, { text: "❌ *Usage:* `.ig <Instagram URL>`" }, { quoted: m });
+    return Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ Yo, give me an Instagram URL to download, fam! 😎
+│❒ Example: *${prefix}${cmd}* https://www.instagram.com/reel/C9bjQfRprHK
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   }
 
   try {
     await Matrix.sendMessage(m.from, { react: { text: "⏳", key: m.key } });
 
-    const { data } = await axios.get(`https://api.davidcyriltech.my.id/instagram?url=${query}`);
+    const apiEndpoint = `https://api.giftedtech.web.id/api/download/instadl?apikey=gifted_api_se5dccy&url=${encodeURIComponent(query)}`;
+    const { data } = await axios.get(apiEndpoint);
 
-    if (!data.success || !data.downloadUrl) {
-      return Matrix.sendMessage(m.from, { text: "⚠️ *Failed to fetch Instagram video. Please try again.*" }, { quoted: m });
+    if (!data.success || !data.result?.download_url) {
+      console.error(`[ERROR] Invalid Instagram API response: ${JSON.stringify(data)}`);
+      return Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* couldn’t fetch the Instagram video. API’s actin’ up! 😡
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
     }
 
+    const { download_url } = data.result;
     await Matrix.sendMessage(m.from, {
-      video: { url: data.downloadUrl },
+      video: { url: download_url },
       mimetype: "video/mp4",
-      caption: "📥 *Powered By JawadTechX ✅*",
+      caption: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* dropped your Instagram video! Watch it 📹, fam!
+◈━━━━━━━━━━━━━━━━◈`,
       contextInfo: {
         mentionedJid: [m.sender],
         forwardingScore: 999,
         isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: "120363354023106228@newsletter",
-          newsletterName: "JawadTechX",
-          serverMessageId: 143,
-        },
       },
     }, { quoted: m });
 
     await Matrix.sendMessage(m.from, { react: { text: "✅", key: m.key } });
 
   } catch (error) {
-    console.error("Instagram Downloader Error:", error);
-    Matrix.sendMessage(m.from, { text: "❌ *An error occurred while processing your request. Please try again later.*" }, { quoted: m });
+    console.error(`[ERROR] Instagram Downloader Error: ${error.message}`);
+    await Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* hit a snag while fetching the Instagram video, fam! Try again! 😈
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   }
 };
 
