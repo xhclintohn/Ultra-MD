@@ -369,6 +369,8 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("anticall")}*
 │ ✘ *${toFancyFont("setstatus")}*
 │ ✘ *${toFancyFont("setnamebot")}*
+│ ✘ *${toFancyFont("autorecording")}*
+│ ✘ *${toFancyFont("autolike")}*
 │ ✘ *${toFancyFont("autotyping")}*
 │ ✘ *${toFancyFont("alwaysonline")}*
 │ ✘ *${toFancyFont("autoread")}*
@@ -404,7 +406,7 @@ const menu = async (m, Matrix) => {
 
 ${menuResponse}
 
-> Pσɯҽ Macau Tσxιƈ-ɱԃȥ
+> Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ
 `;
 
     // Send sub-menu with or without image
