@@ -3,8 +3,8 @@ import config from "../config.cjs";
 
 const facebook = async (m, Matrix) => {
   try {
-    const prefix = config.Prefix || config.PREFIX || ".";
-    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+    const prefix = config.PREFIX;
+    const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
     const query = m.body.slice(prefix.length + cmd.length).trim();
 
     if (!["fb", "facebook"].includes(cmd)) return;
@@ -20,9 +20,9 @@ const facebook = async (m, Matrix) => {
 
     await Matrix.sendMessage(m.from, { react: { text: "⏳", key: m.key } });
 
-    const { data } = await axios.get(`https://api.davidcyriltech.my.id/facebook2?url=${encodeURIComponent(query)}`);
+    const { data } = await axios.get(`https://api.giftedtech.web.id/api/download/facebook?apikey=gifted_api_se5dccy&url=${encodeURIComponent(query)}`);
 
-    if (!data?.status || !data?.video?.downloads) {
+    if (!data.success || !data.result) {
       await Matrix.sendMessage(m.from, { react: { text: "❌", key: m.key } });
       return Matrix.sendMessage(m.from, {
         text: `◈━━━━━━━━━━━━━━━━◈
@@ -31,10 +31,10 @@ const facebook = async (m, Matrix) => {
       }, { quoted: m });
     }
 
-    const { title, downloads } = data.video;
-    const bestQuality = downloads.find((v) => v.quality === "HD") || downloads.find((v) => v.quality === "SD");
+    const { title, hd_video, sd_video, thumbnail } = data.result;
+    const videoUrl = hd_video || sd_video;
 
-    if (!bestQuality) {
+    if (!videoUrl) {
       await Matrix.sendMessage(m.from, { react: { text: "❌", key: m.key } });
       return Matrix.sendMessage(m.from, {
         text: `◈━━━━━━━━━━━━━━━━◈
@@ -43,15 +43,16 @@ const facebook = async (m, Matrix) => {
       }, { quoted: m });
     }
 
+    const quality = hd_video ? "HD" : "SD";
     const caption = `◈━━━━━━━━━━━━━━━━◈
 │❒ *Toxic-MD* Facebook Video 📹
 │❒ 🎬 *Title*: ${title || "No title"}
-│❒ 📥 *Quality*: ${bestQuality.quality}
+│❒ 📥 *Quality*: ${quality}
 │❒ 💥 Powered By *Toxic-MD* 🖤
 ◈━━━━━━━━━━━━━━━━◈`;
 
     await Matrix.sendMessage(m.from, {
-      video: { url: bestQuality.downloadUrl },
+      video: { url: videoUrl },
       mimetype: "video/mp4",
       caption,
     }, { quoted: m });

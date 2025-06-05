@@ -9,51 +9,67 @@ const tiktok = async (m, Matrix) => {
   if (!["tiktok", "tt"].includes(cmd)) return;
 
   if (!query || !query.startsWith("http")) {
-    return Matrix.sendMessage(m.from, { text: "❌ *Usage:* `.tiktok <TikTok URL>`" }, { quoted: m });
+    return Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ ❌ *Usage:* _.tiktok <TikTok URL>_
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   }
 
   try {
     await Matrix.sendMessage(m.from, { react: { text: "⏳", key: m.key } });
 
-    const { data } = await axios.get(`https://api.davidcyriltech.my.id/download/tiktok?url=${query}`);
+    const { data } = await axios.get(`https://api.giftedtech.web.id/api/download/tiktok?apikey=gifted_api_se5dccy&url=${encodeURIComponent(query)}`);
 
     if (!data.success || !data.result || !data.result.video) {
-      return Matrix.sendMessage(m.from, { text: "⚠️ *Failed to fetch TikTok video. Please try again.*" }, { quoted: m });
+      return Matrix.sendMessage(m.from, {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ ⚠️ *Failed to fetch TikTok video. Please try again.*
+◈━━━━━━━━━━━━━━━━◈`,
+      }, { quoted: m });
     }
 
-    const { desc, author, statistics, video, music } = data.result;
+    const { title, author, stats, video, music } = data.result;
 
-    const caption = `🎵 *TikTok Video*\n\n💬 *${desc}*\n👤 *By:* ${author.nickname}\n❤️ *Likes:* ${statistics.likeCount}\n💬 *Comments:* ${statistics.commentCount}\n🔄 *Shares:* ${statistics.shareCount}\n\n📥 *Powered By JawadTechX ✅*`;
+    const caption = `◈━━━━━━━━━━━━━━━━◈
+│❒ 🎵 *TikTok Video*
+│❒ 💬 *${title}*
+│❒ 👤 *By:* ${author.name}
+│❒ ❤️ *Likes:* ${stats.likeCount}
+│❒ 💬 *Comments:* ${stats.commentCount}
+│❒ 🔄 *Shares:* ${stats.shareCount}
+│❒ 📥 *Powered By Toxic-MD ✅*
+◈━━━━━━━━━━━━━━━━◈`;
 
     await Matrix.sendMessage(m.from, {
-      video: { url: video },
+      video: { url: video.noWatermark },
       mimetype: "video/mp4",
       caption,
       contextInfo: {
         mentionedJid: [m.sender],
         forwardingScore: 999,
         isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: "120363354023106228@newsletter",
-          newsletterName: "JawadTechX",
-          serverMessageId: 143,
-        },
       },
     }, { quoted: m });
 
     await Matrix.sendMessage(m.from, { react: { text: "✅", key: m.key } });
 
-    // Send the TikTok music separately
     await Matrix.sendMessage(m.from, {
-      audio: { url: music },
+      audio: { url: music.play_url },
       mimetype: "audio/mpeg",
       fileName: "TikTok_Audio.mp3",
-      caption: "🎶 *TikTok Audio Downloaded*",
+      caption: `◈━━━━━━━━━━━━━━━━◈
+│❒ 🎶 *TikTok Audio Downloaded*
+◈━━━━━━━━━━━━━━━━◈`,
     }, { quoted: m });
 
   } catch (error) {
     console.error("TikTok Downloader Error:", error);
-    Matrix.sendMessage(m.from, { text: "❌ *An error occurred while processing your request. Please try again later.*" }, { quoted: m });
+    Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ ❌ *An error occurred. Please try again later.*
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   }
 };
 
