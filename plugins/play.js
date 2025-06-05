@@ -1,6 +1,13 @@
-import axios from "axios";
-import yts from "yt-search";
+import fetch from 'node-fetch';
+import ytSearch from 'yt-search';
+import fs from 'fs';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
+import os from 'os';
 import config from "../config.cjs";
+
+const streamPipeline = promisify(pipeline);
+const tmpDir = os.tmpdir();
 
 const play = async (m, Matrix) => {
   try {
@@ -12,7 +19,7 @@ const play = async (m, Matrix) => {
       if (args.length === 0 || !args.join(" ")) {
         return Matrix.sendMessage(m.from, {
           text: `◈━━━━━━━━━━━━━━━━◈
-│❒ Yo, give me a song name or keywords to search, fam! 😎
+│❒ Give me a song name or keywords to search 😎
 ◈━━━━━━━━━━━━━━━━◈`,
         }, { quoted: m });
       }
@@ -24,7 +31,7 @@ const play = async (m, Matrix) => {
 ◈━━━━━━━━━━━━━━━━◈`,
       }, { quoted: m });
 
-      const searchResults = await yts(searchQuery);
+      const searchResults = await ytSearch(searchQuery);
       if (!searchResults.videos || searchResults.videos.length === 0) {
         return Matrix.sendMessage(m.from, {
           text: `◈━━━━━━━━━━━━━━━━◈
@@ -34,13 +41,18 @@ const play = async (m, Matrix) => {
       }
 
       const song = searchResults.videos[0];
-      const apiKey = "gifted_api_se5dccy";
-      const apiUrl = `https://api.giftedtech.web.id/api/download/dlmp3?apikey=${apiKey}&url=${encodeURIComponent(song.url)}`;
+      const safeTitle = song.title.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_').substring(0, 100);
+      const filePath = `${tmpDir}/${safeTitle}.mp3`;
 
       let response;
       try {
-        response = await axios.get(apiUrl);
-        console.log(`API response:`, JSON.stringify(response.data, null, 2)); // Debug log
+        const apiUrl = `https://ironman.koyeb.app/ironman/dl/yta?url=${encodeURIComponent(song.url)}`;
+        response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error(`API responded with status: ${response.status}`);
+        }
+        const fileStream = fs.createWriteStream(filePath);
+        await streamPipeline(response.body, fileStream);
       } catch (apiError) {
         console.error(`API error:`, apiError.message);
         return Matrix.sendMessage(m.from, {
@@ -50,39 +62,40 @@ const play = async (m, Matrix) => {
         }, { quoted: m });
       }
 
-      if (!response.data?.success || !response.data?.result) {
-        console.error(`Invalid API response:`, response.data);
-        return Matrix.sendMessage(m.from, {
-          text: `◈━━━━━━━━━━━━━━━━◈
-│❒ *Toxic-MD* got junk data for "${song.title}". API’s trash! 😤
-◈━━━━━━━━━━━━━━━━◈`,
-        }, { quoted: m });
-      }
-
-      const { title, download_url } = response.data.result;
-      if (!title || !download_url) {
-        console.error(`Missing title or download_url in response:`, response.data.result);
-        return Matrix.sendMessage(m.from, {
-          text: `◈━━━━━━━━━━━━━━━━◈
-│❒ *Toxic-MD* can’t play "${song.title}". No audio link, fam! 😣
-◈━━━━━━━━━━━━━━━━◈`,
-        }, { quoted: m });
-      }
-
       // Send the audio file
-      await Matrix.sendMessage(
-        m.from,
-        {
-          audio: { url: download_url },
-          mimetype: "audio/mp4",
+      try {
+        const doc = {
+          audio: {
+            url: filePath,
+          },
+          mimetype: 'audio/mpeg',
           ptt: false,
-        },
-        { quoted: m }
-      );
+          fileName: `${safeTitle}.mp3`,
+        };
+        await Matrix.sendMessage(m.from, doc, { quoted: m });
+
+        setTimeout(() => {
+          try {
+            if (fs.existsSync(filePath)) {
+              fs.unlinkSync(filePath);
+              console.log(`Deleted temp file: ${filePath}`);
+            }
+          } catch (cleanupErr) {
+            console.error('Error during file cleanup:', cleanupErr);
+          }
+        }, 5000);
+      } catch (sendError) {
+        console.error(`Failed to send audio:`, sendError.message);
+        return Matrix.sendMessage(m.from, {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* can’t play "${song.title}". Failed to send audio 😣
+◈━━━━━━━━━━━━━━━━◈`,
+        }, { quoted: m });
+      }
 
       await Matrix.sendMessage(m.from, {
         text: `◈━━━━━━━━━━━━━━━━◈
-│❒ *${title}* dropped by *Toxic-MD*! Blast it, fam! 🎶
+│❒ *${song.title}* dropped by *Toxic-MD*! Blast it! 🎶
 ◈━━━━━━━━━━━━━━━━◈`,
       }, { quoted: m });
     }
