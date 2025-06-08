@@ -3,11 +3,11 @@ import ytSearch from 'yt-search';
 import fs from 'fs';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
-import os from 'os';
+import osCallbacks from 'os';
 import config from "../config.cjs";
 
 const streamPipeline = promisify(pipeline);
-const tmpDir = os.tmpdir();
+const tmpDir = osCallbacks.tmpdir();
 
 const play = async (m, Matrix) => {
   try {
@@ -31,6 +31,7 @@ const play = async (m, Matrix) => {
 ◈━━━━━━━━━━━━━━━━◈`,
       }, { quoted: m });
 
+      // Search YouTube for song info
       const searchResults = await ytSearch(searchQuery);
       if (!searchResults.videos || searchResults.videos.length === 0) {
         return Matrix.sendMessage(m.from, {
@@ -44,15 +45,40 @@ const play = async (m, Matrix) => {
       const safeTitle = song.title.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_').substring(0, 100);
       const filePath = `${tmpDir}/${safeTitle}.mp3`;
 
-      let response;
+      // Fetch download URL from the new API
+      let apiResponse;
       try {
-        const apiUrl = `https://ironman.koyeb.app/ironman/dl/yta?url=${encodeURIComponent(song.url)}`;
-        response = await fetch(apiUrl);
-        if (!response.ok) {
-          throw new Error(`API responded with status: ${response.status}`);
+        const apiUrl = `https://api.giftedtech.web.id/api/download/dlmp3?apikey=gifted_api_se5dccy&url=${encodeURIComponent(song.url)}`;
+        apiResponse = await fetch(apiUrl);
+        if (!apiResponse.ok) {
+          throw new Error(`API responded with status: ${apiResponse.status}`);
+        }
+        const data = await apiResponse.json();
+        if (!data.success || !data.result.download_url) {
+          throw new Error('API response missing download URL or failed');
+        }
+
+        // Send song info from yt-search and API
+        const songInfo = `
+◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* Song Intel 🔥
+│❒ *Title*: ${song.title}
+│❒ *Views*: ${song.views.toLocaleString()}
+│❒ *Duration*: ${song.timestamp}
+│❒ *Channel*: ${song.author.name}
+│❒ *Quality*: ${data.result.quality}
+│❒ *Uploaded*: ${song.ago}
+│❒ *URL*: ${song.url}
+◈━━━━━━━━━━━━━━━━◈`;
+        await Matrix.sendMessage(m.from, { text: songInfo }, { quoted: m });
+
+        // Download the audio file
+        const downloadResponse = await fetch(data.result.download_url);
+        if (!downloadResponse.ok) {
+          throw new Error(`Failed to download audio: ${downloadResponse.status}`);
         }
         const fileStream = fs.createWriteStream(filePath);
-        await streamPipeline(response.body, fileStream);
+        await streamPipeline(downloadResponse.body, fileStream);
       } catch (apiError) {
         console.error(`API error:`, apiError.message);
         return Matrix.sendMessage(m.from, {
@@ -74,6 +100,7 @@ const play = async (m, Matrix) => {
         };
         await Matrix.sendMessage(m.from, doc, { quoted: m });
 
+        // Clean up temp file after 5 seconds
         setTimeout(() => {
           try {
             if (fs.existsSync(filePath)) {
