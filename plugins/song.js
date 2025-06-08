@@ -9,7 +9,7 @@ import config from "../config.cjs";
 const streamPipeline = promisify(pipeline);
 const tmpDir = osCallbacks.tmpdir();
 
-const play = async (m, Matrix) => {
+const song = async (m, Matrix) => {
   try {
     const prefix = config.Prefix || config.PREFIX || ".";
     const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
@@ -115,7 +115,7 @@ const play = async (m, Matrix) => {
         console.error(`Failed to send audio:`, sendError.message);
         return Matrix.sendMessage(m.from, {
           text: `◈━━━━━━━━━━━━━━━━◈
-│❒ *Toxic-MD* can’t play "${song.title}". Failed to send audio 😣
+│❒ *Toxic-MD* can’t song "${song.title}". Failed to send audio 😣
 ◈━━━━━━━━━━━━━━━━◈`,
         }, { quoted: m });
       }
@@ -127,7 +127,7 @@ const play = async (m, Matrix) => {
       }, { quoted: m });
     }
   } catch (error) {
-    console.error(`❌ Play error: ${error.message}`);
+    console.error(`❌ song error: ${error.message}`);
     await Matrix.sendMessage(m.from, {
       text: `◈━━━━━━━━━━━━━━━━◈
 │❒ *Toxic-MD* hit a snag, fam! Try again or pick a better track! 😈
@@ -136,4 +136,4 @@ const play = async (m, Matrix) => {
   }
 };
 
-export default play;
+export default song;
