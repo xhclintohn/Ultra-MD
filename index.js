@@ -164,7 +164,7 @@ async function start() {
           const msg = await store.loadMessage(key.remoteJid, key.id);
           return msg.message || undefined;
         }
-        return { conversation: "JAWAD-MD whatsapp user bot" };
+        return { conversation: "Toxic-MD whatsapp user bot" };
       },
     });
 
