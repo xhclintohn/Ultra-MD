@@ -2,53 +2,140 @@ import config from "../config.cjs";
 
 const block = async (m, Matrix) => {
   try {
-    const botNumber = await Matrix.decodeJid(Matrix.user.id);
-    const isCreator = [botNumber, config.OWNER_NUMBER + "@s.whatsapp.net"].includes(m.sender);
     const prefix = config.Prefix || config.PREFIX || ".";
-    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
-    const text = m.body.slice(prefix.length + cmd.length).trim();
-
+    const cmd = m.body?.startsWith(prefix)
+      ? m.body.slice(prefix.length).trim().split(" ")[0].toLowerCase()
+      : "";
     if (cmd !== "block") return;
 
-    if (!isCreator) {
-      return Matrix.sendMessage(m.from, {
-        text: `◈━━━━━━━━━━━━━━━━◈
-│❒ Piss off, wannabe! Only *Toxic-MD*’s boss can throw blocks! 😤🔪
-◈━━━━━━━━━━━━━━━━◈`,
-      }, { quoted: m });
+    const reactionEmojis = ["🔥", "💖", "🚀", "💨", "🎯", "🎉", "🌟", "💥", "🕐", "🔹"];
+    const textEmojis = ["💎", "🏆", "⚡", "🎖", "🎶", "🌠", "🌀", "🔱", "🚀", "✩"];
+
+    const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
+    let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
+
+    while (textEmoji === reactionEmoji) {
+      textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
     }
 
-    let users = m.mentionedJid[0] || (m.quoted ? m.quoted.sender : null) || (text.replace(/[^0-9]/g, "") + "@s.whatsapp.net");
-    if (!users || users === botNumber) {
-      return Matrix.sendMessage(m.from, {
-        text: `◈━━━━━━━━━━━━━━━━◈
-│❒ Yo, dumbass, tag, quote, or drop a number to block! Don’t make *Toxic-MD* block itself, idiot! 😆
+    await Matrix.sendMessage(m.from, { react: { text: "⏳", key: m.key } });
+
+    // Check if the command is used in a DM (private chat)
+    if (m.from.endsWith("@g.us")) {
+      await Matrix.sendMessage(
+        m.from,
+        {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ Yo, ${m.pushName || "User"}, .block only works in DMs, dumbass! 😤
 ◈━━━━━━━━━━━━━━━━◈`,
-      }, { quoted: m });
+          contextInfo: {
+            mentionedJid: [m.sender],
+            externalAdReply: {
+              showAdAttribution: true,
+              title: `Toxic-MD Block`,
+              body: `Use in private chats only!`,
+              sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
+              mediaType: 1,
+              renderLargerThumbnail: true,
+              mediaUrl: "https://files.catbox.moe/zaqn1j.jpg",
+              thumbnailUrl: "https://files.catbox.moe/zaqn1j.jpg",
+            },
+          },
+        },
+        { quoted: m }
+      );
+      await Matrix.sendMessage(m.from, { react: { text: "❌", key: m.key } });
+      return;
     }
 
-    if (users === m.sender) {
-      return Matrix.sendMessage(m.from, {
-        text: `◈━━━━━━━━━━━━━━━━◈
-│❒ What, you tryna block yourself? *Toxic-MD* ain’t here for your clown shit! 🤡
+    // Get the user to block (the DM partner)
+    const user = m.from;
+    const parts = user.split("@")[0];
+
+    // Validate JID (just in case)
+    if (!user.endsWith("@s.whatsapp.net") || parts.length < 5) {
+      await Matrix.sendMessage(
+        m.from,
+        {
+          text: `◈━━━━━━━━━━━━━━━━◈
+│❒ Yo, ${m.pushName || "User"}, this chat's JID is invalid! 😤
 ◈━━━━━━━━━━━━━━━━◈`,
-      }, { quoted: m });
+          contextInfo: {
+            mentionedJid: [m.sender],
+            externalAdReply: {
+              showAdAttribution: true,
+              title: `Toxic-MD Block`,
+              body: `Visit Toxic-MD repository!`,
+              sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
+              mediaType: 1,
+              renderLargerThumbnail: true,
+              mediaUrl: "https://files.catbox.moe/zaqn1j.jpg",
+              thumbnailUrl: "https://files.catbox.moe/zaqn1j.jpg",
+            },
+          },
+        },
+        { quoted: m }
+      );
+      await Matrix.sendMessage(m.from, { react: { text: "❌", key: m.key } });
+      return;
     }
 
-    await Matrix.updateBlockStatus(users, "block");
-    await Matrix.sendMessage(m.from, {
-      text: `◈━━━━━━━━━━━━━━━━◈
-│❒ *Toxic-MD* yeeted @${users.split("@")[0]} into the void! Blocked, fam! 🚫💥
+    // Block the user
+    await Matrix.updateBlockStatus(user, "block");
+
+    await Matrix.sendMessage(m.from, { react: { text: textEmoji, key: m.key } });
+
+    // Success message
+    await Matrix.sendMessage(
+      m.from,
+      {
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ ${parts} got blocked, yo! ${reactionEmoji}
 ◈━━━━━━━━━━━━━━━━◈`,
-      contextInfo: { mentionedJid: [users] },
-    }, { quoted: m });
+        contextInfo: {
+          mentionedJid: [m.sender, user],
+          externalAdReply: {
+            showAdAttribution: true,
+            title: `Toxic-MD Block`,
+            body: `User blocked successfully!`,
+            sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
+            mediaType: 1,
+            renderLargerThumbnail: true,
+            mediaUrl: "https://files.catbox.moe/zaqn1j.jpg",
+            thumbnailUrl: "https://files.catbox.moe/zaqn1j.jpg",
+          },
+        },
+      },
+      { quoted: m }
+    );
+
+    await Matrix.sendMessage(m.from, { react: { text: "✅", key: m.key } });
   } catch (error) {
     console.error(`❌ Block error: ${error.message}`);
-    await Matrix.sendMessage(m.from, {
-      text: `◈━━━━━━━━━━━━━━━━◈
-│❒ *Toxic-MD* fucked up blockin’ that loser, fam! Try again! 😈
+    await Matrix.sendMessage(
+      m.from,
+      {
+        react: { text: "❌", key: m.key },
+        text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* hit a snag blocking that user! 😡
+│❒ Error: ${error.message || "Failed to block user"}
 ◈━━━━━━━━━━━━━━━━◈`,
-    }, { quoted: m });
+        contextInfo: {
+          mentionedJid: [m.sender],
+          externalAdReply: {
+            showAdAttribution: true,
+            title: `Toxic-MD Block`,
+            body: `Visit Toxic-MD repository!`,
+            sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
+            mediaType: 1,
+            renderLargerThumbnail: true,
+            mediaUrl: "https://files.catbox.moe/zaqn1j.jpg",
+            thumbnailUrl: "https://files.catbox.moe/zaqn1j.jpg",
+          },
+        },
+      },
+      { quoted: m }
+    );
   }
 };
 
