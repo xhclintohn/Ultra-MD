@@ -37,7 +37,7 @@ const Handler = async (chatUpdate, sock, logger) => {
         const isCOMMAND = (body) => PREFIX.test(body);
         const prefixMatch = isCOMMAND(m.body) ? m.body.match(PREFIX) : null;
         const prefix = prefixMatch ? prefixMatch[0] : '/';
-        const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
+        const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).trim().split(' ')[0].toLowerCase() : '';
         const text = m.body.slice(prefix.length + cmd.length).trim();
         const botNumber = await sock.decodeJid(sock.user.id);
         const ownerNumber = config.OWNER_NUMBER + '@s.whatsapp.net';
@@ -58,7 +58,6 @@ const Handler = async (chatUpdate, sock, logger) => {
         await handleAntilink(m, sock, logger, isBotAdmins, isAdmins, isCreator);
 
         const { isGroup, type, sender, from, body } = m;
-      //  console.log(m);
 
         // ✅ Corrected Plugin Folder Path
         const pluginDir = path.resolve(__dirname, '..', 'plugins');  
@@ -89,5 +88,3 @@ const Handler = async (chatUpdate, sock, logger) => {
 };
 
 export default Handler;
-        
-            
