@@ -91,11 +91,10 @@ function toFancyFont(text, isUpperCase = false) {
 
 // Image fetch utility
 async function fetchMenuImage() {
-  const primaryUrl = "https://files.catbox.moe/y2utve.jpg";
-  const fallbackUrl = "https://files.catbox.moe/9kL5x9Q.jpg";
+  const imageUrl = "https://files.catbox.moe/y2utve.jpg";
   for (let i = 0; i < 3; i++) {
     try {
-      const response = await axios.get(primaryUrl, { responseType: "arraybuffer" });
+      const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
       return Buffer.from(response.data, "binary");
     } catch (error) {
       if (error.response?.status === 429 && i < 2) {
@@ -103,142 +102,146 @@ async function fetchMenuImage() {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         continue;
       }
-      console.error("❌ Failed to fetch primary image:", error);
-      try {
-        const response = await axios.get(fallbackUrl, { responseType: "arraybuffer" });
-        return Buffer.from(response.data, "binary");
-      } catch (fallbackError) {
-        console.error("❌ Failed to fetch fallback image:", fallbackError);
-        return null;
-      }
+      console.error("❌ Failed to fetch image:", error);
+      return null;
     }
   }
 }
 
 const menu = async (m, Matrix) => {
-  const prefix = config.PREFIX;
-  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
-  const mode = config.MODE === "public" ? "public" : "private";
-  const totalCommands = 70;
+  try {
+    const prefix = config.PREFIX;
+    const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+    const mode = config.MODE === "public" ? "public" : "private";
+    const totalCommands = 70;
 
-  const validCommands = ["list", "help", "menu"];
-  const subMenuCommands = [
-    "download-menu",
-    "converter-menu",
-    "ai-menu",
-    "tools-menu",
-    "group-menu",
-    "search-menu",
-    "main-menu",
-    "owner-menu",
-    "stalk-menu",
-  ];
+    const validCommands = ["list", "help", "menu"];
+    const subMenuCommands = [
+      "download-menu",
+      "converter-menu",
+      "ai-menu",
+      "tools-menu",
+      "group-menu",
+      "search-menu",
+      "main-menu",
+      "owner-menu",
+      "stalk-menu",
+    ];
 
-  // Fetch image for all cases
-  const menuImage = await fetchMenuImage();
+    // Fetch image for all cases
+    const menuImage = await fetchMenuImage();
 
-  // Handle main menu
-  if (validCommands.includes(cmd)) {
-    const mainMenu = `
-╭─❒ 「 ${toFancyFont("Toxic-MD")} Command Menu ⚠ 」
+    // Handle main menu
+    if (validCommands.includes(cmd)) {
+      const mainMenu = `
+◈━━━━━━━━━━━━━━━━◈
+│❒ ${toFancyFont("Toxic-MD")} Command Menu ⚠
 │
 │ 🤖 *${toFancyFont("Bot")}*: ${toFancyFont("Toxic-MD")}
 │ 📋 *${toFancyFont("Total Commands")}*: ${totalCommands}
 │ 🔣 *${toFancyFont("Prefix")}*: ${prefix}
 │ 🌐 *${toFancyFont("Mode")}*: ${mode}
 │ 📚 *${toFancyFont("Library")}*: Baileys
-╰─────────────
+◈━━━━━━━━━━━━━━━━◈
 
- ${pushwish} @*${m.pushName}*! Tap a button to select a menu category:
+${pushwish} @*${m.pushName}*! Tap a button to select a menu category:
 
 > Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ
 `;
 
-    const messageOptions = {
-      viewOnce: true,
-      buttons: [
-        {
-          buttonId: `${prefix}download-menu`,
-          buttonText: { displayText: `📥 ${toFancyFont("Download")}` },
-          type: 1,
+      const messageOptions = {
+        viewOnce: true,
+        buttons: [
+          {
+            buttonId: `${prefix}download-menu`,
+            buttonText: { displayText: `📥 ${toFancyFont("Download")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}converter-menu`,
+            buttonText: { displayText: `🔄 ${toFancyFont("Converter")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}ai-menu`,
+            buttonText: { displayText: `🤖 ${toFancyFont("AI")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}tools-menu`,
+            buttonText: { displayText: `🛠 ${toFancyFont("Tools")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}group-menu`,
+            buttonText: { displayText: `👥 ${toFancyFont("Group")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}search-menu`,
+            buttonText: { displayText: `🔍 ${toFancyFont("Search")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}main-menu`,
+            buttonText: { displayText: `⚙ ${toFancyFont("Main")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}owner-menu`,
+            buttonText: { displayText: `🔒 ${toFancyFont("Owner")}` },
+            type: 1,
+          },
+          {
+            buttonId: `${prefix}stalk-menu`,
+            buttonText: { displayText: `🕵 ${toFancyFont("Stalk")}` },
+            type: 1,
+          },
+        ],
+        contextInfo: {
+          mentionedJid: [m.sender],
+          externalAdReply: {
+            showAdAttribution: true, // Marks as an ad
+            title: `${toFancyFont("Toxic-MD")} Menu`,
+            body: `${pushwish} Explore Toxic-MD's features!`,
+            sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
+            mediaType: 1,
+            renderLargerThumbnail: true,
+            mediaUrl: "https://files.catbox.moe/zaqn1j.jpg",
+          },
         },
-        {
-          buttonId: `${prefix}converter-menu`,
-          buttonText: { displayText: `🔄 ${toFancyFont("Converter")}` },
-          type: 1,
-        },
-        {
-          buttonId: `${prefix}ai-menu`,
-          buttonText: { displayText: `🤖 ${toFancyFont("AI")}` },
-          type: 1,
-        },
-        {
-          buttonId: `${prefix}tools-menu`,
-          buttonText: { displayText: `🛠 ${toFancyFont("Tools")}` },
-          type: 1,
-        },
-        {
-          buttonId: `${prefix}group-menu`,
-          buttonText: { displayText: `👥 ${toFancyFont("Group")}` },
-          type: 1,
-        },
-        {
-          buttonId: `${prefix}search-menu`,
-          buttonText: { displayText: `🔍 ${toFancyFont("Search")}` },
-          type: 1,
-        },
-        {
-          buttonId: `${prefix}main-menu`,
-          buttonText: { displayText: `⚙ ${toFancyFont("Main")}` },
-          type: 1,
-        },
-        {
-          buttonId: `${prefix}owner-menu`,
-          buttonText: { displayText: `🔒 ${toFancyFont("Owner")}` },
-          type: 1,
-        },
-        {
-          buttonId: `${prefix}stalk-menu`,
-          buttonText: { displayText: `🕵 ${toFancyFont("Stalk")}` },
-          type: 1,
-        },
-      ],
-      contextInfo: {
-        mentionedJid: [m.sender],
-        forwardingScore: 999,
-        isForwarded: true,
-      },
-    };
+      };
 
-    // Send menu with or without image
-    if (menuImage) {
+      // Send menu with or without image
+      if (menuImage) {
+        await Matrix.sendMessage(
+          m.from,
+          { image: menuImage, caption: mainMenu, ...messageOptions },
+          { quoted: m }
+        );
+      } else {
+        await Matrix.sendMessage(m.from, { text: mainMenu, ...messageOptions }, { quoted: m });
+      }
+
+      // Send audio as a voice note
       await Matrix.sendMessage(
         m.from,
-        { image: menuImage, caption: mainMenu, ...messageOptions },
+        { audio: { url: "https://files.catbox.moe/f4zaz4.mp3" }, mimetype: "audio/mp4", ptt: true },
         { quoted: m }
       );
-    } else {
-      await Matrix.sendMessage(m.from, { text: mainMenu, ...messageOptions }, { quoted: m });
     }
 
-    // Send audio as a voice note
-    await Matrix.sendMessage(
-      m.from,
-      { audio: { url: "https://files.catbox.moe/f4zaz4.mp3" }, mimetype: "audio/mp4", ptt: true },
-      { quoted: m }
-    );
-  }
+    // Handle sub-menu commands
+    if (subMenuCommands.includes(cmd)) {
+      let menuTitle;
+      let menuResponse;
 
-  // Handle sub-menu commands
-  if (subMenuCommands.includes(cmd)) {
-    let menuTitle;
-    let menuResponse;
-
-    switch (cmd) {
-      case "download-menu":
-        menuTitle = "Download";
-        menuResponse = `
-╭─❒ 「 ${toFancyFont("Download")} 📥 」
+      switch (cmd) {
+        case "download-menu":
+          menuTitle = "Download";
+          menuResponse = `
+◈━━━━━━━━━━━━━━━━◈
+│❒ ${toFancyFont("Download")} 📥
 │ ✘ *${toFancyFont("apk")}*
 │ ✘ *${toFancyFont("facebook")}*
 │ ✘ *${toFancyFont("mediafire")}*
@@ -254,14 +257,15 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("ytmp3doc")}*
 │ ✘ *${toFancyFont("ytmp4doc")}*
 │ ✘ *${toFancyFont("tiktok")}*
-╰─────────────
+◈━━━━━━━━━━━━━━━━◈
 `;
-        break;
+          break;
 
-      case "converter-menu":
-        menuTitle = "Converter";
-        menuResponse = `
-╭─❒ 「 ${toFancyFont("Converter")} 🔄 」
+        case "converter-menu":
+          menuTitle = "Converter";
+          menuResponse = `
+◈━━━━━━━━━━━━━━━━◈
+│❒ ${toFancyFont("Converter")} 🔄
 │ ✘ *${toFancyFont("attp")}*
 │ ✘ *${toFancyFont("attp2")}*
 │ ✘ *${toFancyFont("attp3")}*
@@ -269,14 +273,15 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("dbinary")}*
 │ ✘ *${toFancyFont("emojimix")}*
 │ ✘ *${toFancyFont("mp3")}*
-╰─────────────
+◈━━━━━━━━━━━━━━━━◈
 `;
-        break;
+          break;
 
-      case "ai-menu":
-        menuTitle = "AI";
-        menuResponse = `
-╭─❒ 「 ${toFancyFont("AI")} 🤖 」
+        case "ai-menu":
+          menuTitle = "AI";
+          menuResponse = `
+◈━━━━━━━━━━━━━━━━◈
+│❒ ${toFancyFont("AI")} 🤖
 │ ✘ *${toFancyFont("ai")}*
 │ ✘ *${toFancyFont("bug")}*
 │ ✘ *${toFancyFont("report")}*
@@ -284,27 +289,29 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("dalle")}*
 │ ✘ *${toFancyFont("remini")}*
 │ ✘ *${toFancyFont("gemini")}*
-╰─────────────
+◈━━━━━━━━━━━━━━━━◈
 `;
-        break;
+          break;
 
-      case "tools-menu":
-        menuTitle = "Tools";
-        menuResponse = `
-╭─❒ 「 ${toFancyFont("Tools")} 🛠 」
+        case "tools-menu":
+          menuTitle = "Tools";
+          menuResponse = `
+◈━━━━━━━━━━━━━━━━◈
+│❒ ${toFancyFont("Tools")} 🛠
 │ ✘ *${toFancyFont("calculator")}*
 │ ✘ *${toFancyFont("tempmail")}*
 │ ✘ *${toFancyFont("checkmail")}*
 │ ✘ *${toFancyFont("trt")}*
 │ ✘ *${toFancyFont("tts")}*
-╰─────────────
+◈━━━━━━━━━━━━━━━━◈
 `;
-        break;
+          break;
 
-      case "group-menu":
-        menuTitle = "Group";
-        menuResponse = `
-╭─❒ 「 ${toFancyFont("Group")} 👥 」
+        case "group-menu":
+          menuTitle = "Group";
+          menuResponse = `
+◈━━━━━━━━━━━━━━━━◈
+│❒ ${toFancyFont("Group")} 👥
 │ ✘ *${toFancyFont("linkgroup")}*
 │ ✘ *${toFancyFont("setppgc")}*
 │ ✘ *${toFancyFont("setname")}*
@@ -321,14 +328,15 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("promote")}*
 │ ✘ *${toFancyFont("demote")}*
 │ ✘ *${toFancyFont("getbio")}*
-╰─────────────
+◈━━━━━━━━━━━━━━━━◈
 `;
-        break;
+          break;
 
-      case "search-menu":
-        menuTitle = "Search";
-        menuResponse = `
-╭─❒ 「 ${toFancyFont("Search")} 🔍 」
+        case "search-menu":
+          menuTitle = "Search";
+          menuResponse = `
+◈━━━━━━━━━━━━━━━━◈
+│❒ ${toFancyFont("Search")} 🔍
 │ ✘ *${toFancyFont("play")}*
 │ ✘ *${toFancyFont("yts")}*
 │ ✘ *${toFancyFont("imdb")}*
@@ -340,27 +348,29 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("ytsearch")}*
 │ ✘ *${toFancyFont("ringtone")}*
 │ ✘ *${toFancyFont("lyrics")}*
-╰─────────────
+◈━━━━━━━━━━━━━━━━◈
 `;
-        break;
+          break;
 
-      case "main-menu":
-        menuTitle = "Main";
-        menuResponse = `
-╭─❒ 「 ${toFancyFont("Main")} ⚙ 」
+        case "main-menu":
+          menuTitle = "Main";
+          menuResponse = `
+◈━━━━━━━━━━━━━━━━◈
+│❒ ${toFancyFont("Main")} ⚙
 │ ✘ *${toFancyFont("ping")}*
 │ ✘ *${toFancyFont("alive")}*
 │ ✘ *${toFancyFont("owner")}*
 │ ✘ *${toFancyFont("menu")}*
 │ ✘ *${toFancyFont("infobot")}*
-╰─────────────
+◈━━━━━━━━━━━━━━━━◈
 `;
-        break;
+          break;
 
-      case "owner-menu":
-        menuTitle = "Owner";
-        menuResponse = `
-╭─❒ 「 ${toFancyFont("Owner")} 🔒 」
+        case "owner-menu":
+          menuTitle = "Owner";
+          menuResponse = `
+◈━━━━━━━━━━━━━━━━◈
+│❒ ${toFancyFont("Owner")} 🔒
 │ ✘ *${toFancyFont("join")}*
 │ ✘ *${toFancyFont("leave")}*
 │ ✘ *${toFancyFont("block")}*
@@ -375,58 +385,88 @@ const menu = async (m, Matrix) => {
 │ ✘ *${toFancyFont("alwaysonline")}*
 │ ✘ *${toFancyFont("autoread")}*
 │ ✘ *${toFancyFont("autosview")}*
-╰─────────────
+◈━━━━━━━━━━━━━━━━◈
 `;
-        break;
+          break;
 
-      case "stalk-menu":
-        menuTitle = "Stalk";
-        menuResponse = `
-╭─❒ 「 ${toFancyFont("Stalk")} 🕵 」
+        case "stalk-menu":
+          menuTitle = "Stalk";
+          menuResponse = `
+◈━━━━━━━━━━━━━━━━◈
+│❒ ${toFancyFont("Stalk")} 🕵
 │ ✘ *${toFancyFont("truecaller")}*
 │ ✘ *${toFancyFont("instastalk")}*
 │ ✘ *${toFancyFont("githubstalk")}*
-╰─────────────
+◈━━━━━━━━━━━━━━━━◈
 `;
-        break;
+          break;
 
-      default:
-        return;
-    }
+        default:
+          return;
+      }
 
-    // Format the full response
-    const fullResponse = `
-╭─❒ 「 ${toFancyFont("Toxic-MD")} - ${toFancyFont(menuTitle)} ⚠ 」
+      // Format the full response
+      const fullResponse = `
+◈━━━━━━━━━━━━━━━━◈
+│❒ ${toFancyFont("Toxic-MD")} - ${toFancyFont(menuTitle)} ⚠
 │
 │ 🤖 *${toFancyFont("Bot")}*: ${toFancyFont("Toxic-MD")}
 │ 👤 *${toFancyFont("User")}*: ${m.pushName}
 │ 🔣 *${toFancyFont("Prefix")}*: ${prefix}
 │ 📚 *${toFancyFont("Library")}*: Baileys
-╰─────────────
+◈━━━━━━━━━━━━━━━━◈
 
 ${menuResponse}
 
 > Pσɯҽɾҽԃ Ⴆყ Tσxιƈ-ɱԃȥ
 `;
 
-    // Send sub-menu with or without image
-    if (menuImage) {
-      await Matrix.sendMessage(
-        m.from,
-        {
-          image: menuImage,
-          caption: fullResponse,
+      // Send sub-menu with or without image
+      if (menuImage) {
+        await Matrix.sendMessage(
+          m.from,
+          {
+            image: menuImage,
+            caption: fullResponse,
+            contextInfo: {
+              mentionedJid: [m.sender],
+              externalAdReply: {
+                showAdAttribution: true, // Marks as an ad
+                title: `${toFancyFont("Toxic-MD")} ${toFancyFont(menuTitle)}`,
+                body: `Explore Toxic-MD's ${menuTitle.toLowerCase()} commands!`,
+                sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
+                mediaType: 1,
+                renderLargerThumbnail: true,
+                mediaUrl: "https://files.catbox.moe/zaqn1j.jpg",
+              },
+            },
+          },
+          { quoted: m }
+        );
+      } else {
+        await Matrix.sendMessage(m.from, {
+          text: fullResponse,
           contextInfo: {
             mentionedJid: [m.sender],
-            forwardingScore: 999,
-            isForwarded: true,
+            externalAdReply: {
+              showAdAttribution: true, // Marks as an ad
+              title: `${toFancyFont("Toxic-MD")} ${toFancyFont(menuTitle)}`,
+              body: `Explore Toxic-MD's ${menuTitle.toLowerCase()} commands!`,
+              sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
+              mediaType: 1,
+              renderLargerThumbnail: true,
+            },
           },
-        },
-        { quoted: m }
-      );
-    } else {
-      await Matrix.sendMessage(m.from, { text: fullResponse }, { quoted: m });
+        }, { quoted: m });
+      }
     }
+  } catch (error) {
+    console.error(`❌ Menu error: ${error.message}`);
+    await Matrix.sendMessage(m.from, {
+      text: `◈━━━━━━━━━━━━━━━━◈
+│❒ *Toxic-MD* hit a snag! Error: ${error.message || "Failed to load menu"} 😡
+◈━━━━━━━━━━━━━━━━◈`,
+    }, { quoted: m });
   }
 };
 
