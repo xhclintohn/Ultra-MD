@@ -227,7 +227,6 @@ async function start() {
             `✨ *Bot Name*: Toxic-MD`,
             `🔧 *Mode*: ${config.MODE || "public"}`,
             `➡️ *Prefix*: ${prefix}`,
-            `📋 *Commands*: 0`,
             `🕒 *Time*: ${getCurrentTime()}`,
             `💾 *Database*: None`,
             `📚 *Library*: Baileys`,
