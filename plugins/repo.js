@@ -71,11 +71,28 @@ const repo = async (m, Matrix) => {
     if (!["repo", "sc", "script", "info"].includes(cmd)) return;
 
     if (text) {
-      await Matrix.sendMessage(m.from, {
-        text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+      await Matrix.sendMessage(
+        m.from,
+        {
+          text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
 │❒ Yo, ${m.pushName}, quit the extra bullshit! Just use *${prefix}repo*, dumbass! 😤
 ◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
-      }, { quoted: m });
+          contextInfo: {
+            mentionedJid: [m.sender],
+            externalAdReply: {
+              showAdAttribution: true,
+              title: `Toxic-MD Repo`,
+              body: `Check the Toxic-MD repository!`,
+              sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
+              mediaType: 1,
+              renderLargerThumbnail: true,
+              mediaUrl: "https://files.catbox.moe/zaqn1j.jpg",
+              thumbnailUrl: "https://files.catbox.moe/zaqn1j.jpg",
+            },
+          },
+        },
+        { quoted: m }
+      );
       return;
     }
 
@@ -115,6 +132,19 @@ const repo = async (m, Matrix) => {
       {
         image: { url: "https://files.catbox.moe/y2utve.jpg" },
         caption: replyText,
+        contextInfo: {
+          mentionedJid: [m.sender],
+          externalAdReply: {
+            showAdAttribution: true,
+            title: `Toxic-MD Repo`,
+            body: `Explore the Toxic-MD repository!`,
+            sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
+            mediaType: 1,
+            renderLargerThumbnail: true,
+            mediaUrl: "https://files.catbox.moe/zaqn1j.jpg",
+            thumbnailUrl: "https://files.catbox.moe/zaqn1j.jpg",
+          },
+        },
       },
       { quoted: m }
     );
@@ -122,13 +152,30 @@ const repo = async (m, Matrix) => {
     await Matrix.sendMessage(m.from, { react: { text: "✅", key: m.key } });
   } catch (error) {
     console.error(`❌ Repo error: ${error.message}`);
-    await Matrix.sendMessage(m.from, {
-      react: { text: "❌", key: m.key },
-      text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
+    await Matrix.sendMessage(
+      m.from,
+      {
+        react: { text: "❌", key: m.key },
+        text: `◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈
 │❒ *Toxic-MD* failed to fetch repo stats! 😈
 │❒ Visit: https://github.com/xhclintohn/Toxic-MD
 ◈┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅◈`,
-    }, { quoted: m });
+        contextInfo: {
+          mentionedJid: [m.sender],
+          externalAdReply: {
+            showAdAttribution: true,
+            title: `Toxic-MD Repo`,
+            body: `Visit the Toxic-MD repository!`,
+            sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
+            mediaType: 1,
+            renderLargerThumbnail: true,
+            mediaUrl: "https://files.catbox.moe/zaqn1j.jpg",
+            thumbnailUrl: "https://files.catbox.moe/zaqn1j.jpg",
+          },
+        },
+      },
+      { quoted: m }
+    );
   }
 };
 
