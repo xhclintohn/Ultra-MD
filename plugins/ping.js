@@ -37,7 +37,7 @@ const ping = async (m, Matrix) => {
           externalAdReply: {
             showAdAttribution: true, // Marks as an ad
             title: `Toxic-MD Speed`,
-            body: `Check your connection speed with Toxic-MD!`,
+            body: `Checking your connection speed with Toxic-MD!`,
             sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
             mediaType: 1,
             renderLargerThumbnail: true,
