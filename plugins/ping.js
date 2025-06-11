@@ -3,10 +3,10 @@ import config from "../config.cjs";
 const ping = async (m, Matrix) => {
   try {
     const prefix = config.Prefix || config.PREFIX || ".";
-    const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
+    const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).trim().split(" ")[0].toLowerCase() : "";
     const text = m.body.slice(prefix.length + cmd.length).trim();
 
-    const validCommands = ['ping', 'speed', 'p'];
+    const validCommands = ["ping", "speed", "p"];
 
     if (validCommands.includes(cmd)) {
       const start = new Date().getTime();
@@ -27,15 +27,23 @@ const ping = async (m, Matrix) => {
       const responseTime = (end - start) / 1000;
 
       const message = `◈━━━━━━━━━━━━━━━━◈
-│❒ *Toxic-MD* speed is *${responseTime.toFixed(1)}s*! Your connection's trash. ${reactionEmoji} 💀
+│❒ Toxic-MD speed - ${responseTime.toFixed(1)}s! ${reactionEmoji}
 ◈━━━━━━━━━━━━━━━━◈`;
 
       await Matrix.sendMessage(m.from, {
         text: message,
         contextInfo: {
           mentionedJid: [m.sender],
-          forwardingScore: 999,
-          isForwarded: true,
+          externalAdReply: {
+            showAdAttribution: true, // Marks as an ad
+            title: `Toxic-MD Speed`,
+            body: `Check your connection speed with Toxic-MD!`,
+            sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
+            mediaType: 1,
+            renderLargerThumbnail: true,
+            mediaUrl: "https://files.catbox.moe/zaqn1j.jpg",
+            thumbnailUrl: "https://files.catbox.moe/zaqn1j.jpg",
+          },
         },
       }, { quoted: m });
     }
@@ -43,7 +51,7 @@ const ping = async (m, Matrix) => {
     console.error(`❌ Ping error: ${error.message}`);
     await Matrix.sendMessage(m.from, {
       text: `◈━━━━━━━━━━━━━━━━◈
-│❒ System error, but xh_clinton’s bot still outclasses you. 🖕
+│❒ *Toxic-MD* hit a snag! Error: ${error.message || "Failed to check speed"} 😡
 ◈━━━━━━━━━━━━━━━━◈`,
     }, { quoted: m });
   }
