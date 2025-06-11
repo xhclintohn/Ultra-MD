@@ -1,5 +1,3 @@
-import fs from "fs";
-import axios from "axios";
 import config from "../config.cjs";
 
 const alive = async (m, Matrix) => {
@@ -12,38 +10,41 @@ const alive = async (m, Matrix) => {
     const timeString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
     const prefix = config.Prefix || config.PREFIX || ".";
-    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).split(" ")[0].toLowerCase() : "";
+    const cmd = m.body?.startsWith(prefix) ? m.body.slice(prefix.length).trim().split(" ")[0].toLowerCase() : "";
 
     if (!["alive", "uptime", "runtime"].includes(cmd)) return;
 
-    let imageBuffer;
-    try {
-      const response = await axios.get("https://files.catbox.moe/eojuys.jpg", { responseType: "arraybuffer" });
-      imageBuffer = Buffer.from(response.data, "binary");
-    } catch (error) {
-      console.error(`Error fetching image: ${error.message}`);
-      imageBuffer = fs.readFileSync("./media/toxic.jpg"); // Fallback
+    const reactionEmojis = ["🔥", "💖", "🚀", "💨", "🎯", "🎉", "🌟", "💥", "🕐", "🔹"];
+    const textEmojis = ["💎", "🏆", "⚡", "🎖", "🎶", "🌠", "🌀", "🔱", "🚀", "✩"];
+
+    const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
+    let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
+
+    while (textEmoji === reactionEmoji) {
+      textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
     }
 
-    const str = `◈━━━━━━━━━━━━━━━━◈
-│❒ *Toxic-MD* is LIVE, fam! 🤖
-│❒ ⏳ *Uptime*: ${timeString}
-│❒ 🔥 Keepin’ it savage!
+    await m.React(textEmoji);
+
+    const message = `◈━━━━━━━━━━━━━━━━◈
+│❒ Toxic-MD alive - ${timeString}! ${reactionEmoji}
 ◈━━━━━━━━━━━━━━━━◈`;
 
     await Matrix.sendMessage(
       m.from,
       {
-        image: imageBuffer,
-        caption: str,
+        text: message,
         contextInfo: {
           mentionedJid: [m.sender],
-          forwardingScore: 999,
-          isForwarded: true,
-          forwardedNewsletterMessageInfo: {
-            newsletterJid: "120363398040175935@newsletter",
-            newsletterName: "Toxic-MD",
-            serverMessageId: 143,
+          externalAdReply: {
+            showAdAttribution: true,
+            title: `Toxic-MD Status`,
+            body: `Check Toxic-MD's uptime!`,
+            sourceUrl: "https://github.com/xhclintohn/Toxic-MD",
+            mediaType: 1,
+            renderLargerThumbnail: true,
+            mediaUrl: "https://files.catbox.moe/zaqn1j.jpg",
+            thumbnailUrl: "https://files.catbox.moe/zaqn1j.jpg",
           },
         },
       },
@@ -53,7 +54,7 @@ const alive = async (m, Matrix) => {
     console.error(`❌ Alive error: ${error.message}`);
     await Matrix.sendMessage(m.from, {
       text: `◈━━━━━━━━━━━━━━━━◈
-│❒ *Toxic-MD* hit a snag, fam! Try again! 😈
+│❒ *Toxic-MD* hit a snag! Error: ${error.message || "Failed to check status"} 😡
 ◈━━━━━━━━━━━━━━━━◈`,
     }, { quoted: m });
   }
