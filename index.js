@@ -1,1 +1,374 @@
-import{_0x1a2b,_0x3c4d,_0x5e6f,_0x7g8h}from"baileys-pro";import{_0x9i0j,_0xklmn,_0xopqr}from"./data/index.js";import _0xstuv from"express";import _0xwxyz from"pino";import _0x0abc from"fs";import _0xdefg from"node-cache";import _0xhijk from"path";import _0xlmno from"chalk";import _0xpqrs from"moment-timezone";import{_0xtuvwxyz}from"luxon";import _0xConfig from"./config.cjs";import _0xAutoReact from"./lib/autoreact.cjs";const{_0xEmojis,_0xDoReact}=_0xAutoReact;const _0xPrefix=_0xConfig.PREFIX||".";const _0xApp=_0xstuv();const _0xPort=_0xConfig.PORT||(0xBB8^0x0);const _0xLogger=_0xwxyz({timestamp:()=>`,time:"${new Date().toJSON()}"`}),_0xSubLogger=_0xLogger.child({});_0xSubLogger.level="trace";const _0xCache=new _0xdefg();const _0xFile=new URL(import.meta.url).pathname,_0xDir=_0xhijk.dirname(_0xFile),_0xSessDir=_0xhijk.join(_0xDir,"session"),_0xCredsPath=_0xhijk.join(_0xSessDir,"creds.json");if(!_0x0abc.existsSync(_0xSessDir)){_0x0abc.mkdirSync(_0xSessDir,{recursive:true});}function _0xStrDecrypt(_0xStr){const _0xKey="Toxic2025";let _0xOut="";for(let _0xi=0;_0xi<_0xStr.length;_0xi++){_0xOut+=String.fromCharCode(_0xStr.charCodeAt(_0xi)^_0xKey.charCodeAt(_0xi%_0xKey.length));}return _0xOut;}async function _0xLoadSess(){const _0xCreds=_0xConfig.SESSION_ID;if(!_0xCreds||_0xCreds===_0xStrDecrypt("PQRSSTUV")){console.error(_0xlmno.red(_0xStrDecrypt("]^_`abcdefg\nhijklmnopqrstuvwxyz{|}~\x7F\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F !\x22#$%")));process.exit(1);}try{const _0xBuff=Buffer.from(_0xCreds,"base64");await _0x0abc.promises.writeFile(_0xCredsPath,_0xBuff);return true;}catch(_0xErr){console.error(_0xlmno.red(_0xStrDecrypt("]^_`abcdefg\nhijklmnopqrstuvwxyz{|}~\x7F\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F !\x22#$%&'(")));process.exit(1);}}function _0xGetGreet(){const _0xHour=_0xtuvwxyz.now().setZone(_0xStrDecrypt("]^_`abc")).hour;if(_0xHour>=5&&_0xHour<12)return _0xStrDecrypt("]^_`abcdefg");if(_0xHour>=12&&_0xHour<18)return _0xStrDecrypt("]^_`abcdefg");if(_0xHour>=18&&_0xHour<22)return _0xStrDecrypt("]^_`abcdefg");return _0xStrDecrypt("]^_`abcdefg");}function _0xGetTime(){return _0xtuvwxyz.now().setZone(_0xStrDecrypt("]^_`abc")).toLocaleString(_0xtuvwxyz.TIME_SIMPLE);}function _0xFancyFont(_0xText,_0xUpper=false){const _0xFonts={A:"𝘼",B:"𝘽",C:"𝘾",D:"𝘷",E:"𝙀",F:"𝙁",G:"𝙂",H:"𝙃",I:"𝙄",J:"𝙅",K:"𝙆",L:"𝙇",M:"𝙈",N:"𝙉",O:"𝙊",P:"𝙋",Q:"𝙌",R:"𝙍",S:"𝙎",T:"𝙏",U:"𝙐",V:"𝙑",W:"𝙒",X:"𝙓",Y:"𝙔",Z:"𝙕",a:"𝙖",b:"𝙗",c:"𝙘",d:"𝙙",e:"𝙚",f:"𝙛",g:"𝙜",h:"𝙝",i:"𝙞",j:"𝙟",k:"𝙠",l:"𝙡",m:"𝙢",n:"𝙣",o:"𝙤",p:"𝙥",q:"𝙦",r:"𝙧",s:"𝙨",t:"𝙩",u:"𝙪",v:"𝙫",w:"𝙬",x:"𝙭",y:"𝙮",z:"𝙯"};const _0xFmt=_0xUpper?_0xText.toUpperCase():_0xText.toLowerCase();return _0xFmt.split("").map(_0xChar=>_0xFonts[_0xChar]||_0xChar).join("");}const _0xReplies=[_0xStrDecrypt("]^_`abcdefg"),_0xStrDecrypt("]^_`abcdefg"),_0xStrDecrypt("]^_`abcdefg"),_0xStrDecrypt("]^_`abcdefg"),_0xStrDecrypt("]^_`abcdefg"),_0xStrDecrypt("]^_`abcdefg"),_0xStrDecrypt("]^_`abcdefg"),_0xStrDecrypt("]^_`abcdefg")];async function _0xStart(){try{await _0xLoadSess();const{_0xState:_0xAuth,_0xSaveCreds}=await _0x7g8h(_0xSessDir);const{_0xVersion}=await _0x3c4d();const _0xMatrix=_0x1a2b({version:_0xVersion,logger:_0xwxyz({level:_0xStrDecrypt("]^_`abc")}),browser:[_0xStrDecrypt("]^_`abc"),"Chrome","1.0.0"],auth:_0xAuth,getMessage:async(_0xKey)=>{if(store){const _0xMsg=await store.loadMessage(_0xKey.remoteJid,_0xKey.id);return _0xMsg.message||undefined;}return{conversation:_0xStrDecrypt("]^_`abcdefg")};}});let _0xHasSent=false;_0xMatrix.ev.on(_0xStrDecrypt("]^_`abcdefg"),async(_0xUpdate)=>{const{_0xConn,_0xLastDisc}=_0xUpdate;if(_0xConn===_0xStrDecrypt("]^_`abc")){const _0xCode=_0xLastDisc.error?.output?.statusCode;switch(_0xCode){case _0x5e6f.badSession:console.error(_0xlmno.red(_0xStrDecrypt("]^_`abcdefg\nhijklmnopqrstuvwxyz{|}~\x7F\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F !\x22#$%&'()")));process.exit();break;case _0x5e6f.connectionClosed:case _0x5e6f.connectionLost:case _0x5e6f.restartRequired:case _0x5e6f.timedOut:_0xStart();break;case _0x5e6f.connectionReplaced:process.exit();break;case _0x5e6f.loggedOut:console.error(_0xlmno.red(_0xStrDecrypt("]^_`abcdefg\nhijklmnopqrstuvwxyz{|}~\x7F\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F !\x22#$%&'()*")));_0xHasSent=false;process.exit();break;default:_0xStart();}return;}if(_0xConn===_0xStrDecrypt("]^_`abc")){try{await _0xMatrix.groupAcceptInvite(_0xStrDecrypt("]^_`abcdefg"));}catch(_0xErr){}if(!_0xHasSent){const _0xMsg1=[_0xStrDecrypt("]^_`abcdefg"),`│❒ *${_0xGetGreet()}*`,_0xStrDecrypt("]^_`abcdefg"),"",_0xStrDecrypt("]^_`abcdefg"),_0xStrDecrypt("]^_`abcdefg")+(_0xConfig.MODE||"public"),_0xStrDecrypt("]^_`abcdefg")+_0xPrefix,_0xStrDecrypt("]^_`abcdefg")+_0xGetTime(),_0xStrDecrypt("]^_`abcdefg"),_0xStrDecrypt("]^_`abcdefg"),"",_0xStrDecrypt("]^_`abcdefg"),_0xStrDecrypt("]^_`abcdefg")].join("\n");const _0xMsg2=[_0xStrDecrypt("]^_`abcdefg"),_0xStrDecrypt("]^_`abcdefg"),_0xStrDecrypt("]^_`abcdefg")].join("\n");try{await _0xMatrix.sendMessage(_0xMatrix.user.id,{text:_0xMsg1,footer:_0xStrDecrypt("]^_`abcdefg"),viewOnce:true,contextInfo:{externalAdReply:{showAdAttribution:false,title:_0xStrDecrypt("]^_`abc"),body:_0xStrDecrypt("]^_`abcdefg"),sourceUrl:_0xStrDecrypt("]^_`abcdefg"),mediaType:1,renderLargerThumbnail:true}}});await _0xMatrix.sendMessage(_0xMatrix.user.id,{text:_0xMsg2,footer:_0xStrDecrypt("]^_`abcdefg"),buttons:[{buttonId:`${_0xPrefix}menu`,buttonText:{displayText:`📖 ${_0xFancyFont(_0xStrDecrypt("]^_`abc"))}`},type:1}],headerType:1,viewOnce:true,contextInfo:{externalAdReply:{showAdAttribution:false,title:_0xStrDecrypt("]^_`abc"),body:_0xStrDecrypt("]^_`abcdefg"),sourceUrl:_0xStrDecrypt("]^_`abcdefg"),mediaType:1,renderLargerThumbnail:true}}});}catch(_0xErr){console.error(_0xlmno.red(_0xStrDecrypt("]^_`abcdefg\nhijklmnopqrstuvwxyz{|}~\x7F\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F !\x22#$%&'()*+")));}_0xHasSent=true;console.log(_0xlmno.green(_0xStrDecrypt("]^_`abcdefg\nhijklmnopqrstuvwxyz{|}~\x7F\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F !\x22#$%&'()*+,")"));}}});_0xMatrix.ev.on(_0xStrDecrypt("]^_`abcdefg"),_0xSaveCreds);_0xMatrix.ev.on(_0xStrDecrypt("]^_`abcdefg"),async(_0xChat)=>{try{const _0xMek=_0xChat.messages[0];if(!_0xMek||!_0xMek.message)return;if(_0xMek.message?.protocolMessage||_0xMek.message?.ephemeralMessage||_0xMek.message?.reactionMessage)return;const _0xFromJid=_0xMek.key.participant||_0xMek.key.remoteJid;if(_0xMek.key.remoteJid===_0xStrDecrypt("]^_`abcdefg")&&_0xConfig.AUTO_STATUS_SEEN){await _0xMatrix.readMessages([_0xMek.key]);if(_0xConfig.AUTO_STATUS_REACT){const _0xEmojis=['😈','💀','🔥','🖕','💥','⚡','🚀','❤️','💸','😇','🍂','💯','💫','💎','💗','🤍','🖤','👀','🙌','🙆','🚩','🥰','💐','😎','🤎','✅','🫀','🧡','😁','😄','🌸','🕊️','🌷','⛅','🌟','🗿','🇵🇰','💜','💙','🌝','🎎','🎏','🎐','⚽','🧣','🌿','⛈️','🌦️','🌚','🙈','🙉','🦖','🐤','🎗️','🥇','👾','🔫','🐝','🦋','🍓','🍫','🍭','🧁','🧃','🍿','🍻','🎀','🧸','👑','〽️','😳','☠️','👻','♥️','🐼'];const _0xRandEmoji=_0xEmojis[Math.floor(Math.random()*_0xEmojis.length)];await _0xMatrix.sendMessage(_0xMek.key.remoteJid,{react:{text:_0xRandEmoji,key:_0xMek.key}});}if(_0xConfig.AUTO_STATUS_REPLY){const _0xRandReply=_0xReplies[Math.floor(Math.random()*_0xReplies.length)];await _0xMatrix.sendMessage(_0xFromJid,{text:_0xRandReply},{quoted:_0xMek});}return;}if(!_0xMek.key.fromMe&&_0xConfig.AUTO_REACT&&_0xMek.message){const _0xRandEmoji=_0xEmojis[Math.floor(Math.random()*_0xEmojis.length)];await _0xDoReact(_0xRandEmoji,_0xMek,_0xMatrix);}if(_0xConfig.AUTO_READ&&!_0xMek.key.fromMe){await _0xMatrix.readMessages([_0xMek.key]);}await _0x9i0j(_0xChat,_0xMatrix,_0xSubLogger);}catch(_0xErr){console.error(_0xlmno.red(_0xStrDecrypt("]^_`abcdefg\nhijklmnopqrstuvwxyz{|}~\x7F\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F !\x22#$%&'()*+,")));}}});_0xMatrix.ev.on(_0xStrDecrypt("]^_`abcdefg"),async(_0xJson)=>await _0xklmn(_0xJson,_0xMatrix));_0xMatrix.ev.on(_0xStrDecrypt("]^_`abcdefg"),async(_0xMsg)=>await _0xopqr(_0xMatrix,_0xMsg));if(_0xConfig.MODE===_0xStrDecrypt("]^_`abc")){_0xMatrix.public=true;}else if(_0xConfig.MODE===_0xStrDecrypt("]^_`abc")){_0xMatrix.public=false;}if(Math.random()>0.99){console.log(_0xStrDecrypt("]^_`abcdefg"));}}catch(_0xErr){console.error(_0xlmno.red(_0xStrDecrypt("]^_`abcdefg\nhijklmnopqrstuvwxyz{|}~\x7F\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F !\x22#$%&'()*+,-")));process.exit(1);}}_0xStart();_0xApp.get(_0xStrDecrypt("]^_`abc"),(_0xReq,_0xRes)=>{if(typeof window!==_0xStrDecrypt("]^_`abc")){_0xRes.send(_0xStrDecrypt("]^_`abcdefg"));}else{console.error(_0xStrDecrypt("]^_`abcdefg"));process.exit(1);}});_0xApp.listen(_0xPort,()=>{});
+import {
+  makeWASocket,
+  fetchLatestBaileysVersion,
+  DisconnectReason,
+  useMultiFileAuthState,
+} from "baileys-pro";
+import { Handler, Callupdate, GroupUpdate } from "./data/index.js";
+import express from "express";
+import pino from "pino";
+import fs from "fs";
+import NodeCache from "node-cache";
+import path from "path";
+import chalk from "chalk";
+import moment from "moment-timezone";
+import { DateTime } from "luxon";
+import config from "./config.cjs";
+import pkg from "./lib/autoreact.cjs";
+const { emojis, doReact } = pkg;
+const prefix = config.PREFIX || "!";
+const app = express();
+const PORT = config.PORT || 3000;
+
+const MAIN_LOGGER = pino({
+  timestamp: () => `,"time":"${new Date().toJSON()}"`,
+});
+const logger = MAIN_LOGGER.child({});
+logger.level = "trace";
+
+const msgRetryCounterCache = new NodeCache();
+
+const __filename = new URL(import.meta.url).pathname;
+const __dirname = path.dirname(__filename);
+
+const sessionDir = path.join(__dirname, "session");
+const credsPath = path.join(sessionDir, "creds.json");
+
+if (!fs.existsSync(sessionDir)) {
+  fs.mkdirSync(sessionDir, { recursive: true });
+}
+
+// Load Base64 session from env
+async function loadBase64Session() {
+  const base64Creds = config.SESSION_ID;
+  if (!base64Creds || base64Creds === "Your Session Id") {
+    console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ No SESSION_ID? You tryna crash Toxic-MD, noob? 😡
+│❒ Add a valid base64 SESSION_ID to your .env!
+◈━━━━━━━━━━━━━━━━◈`));
+    process.exit(1);
+  }
+
+  try {
+    const credsBuffer = Buffer.from(base64Creds, "base64");
+    await fs.promises.writeFile(credsPath, credsBuffer);
+    return true;
+  } catch (error) {
+    console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Failed to load SESSION_ID: ${error.message} 💀
+│❒ Fix your base64 string, you amateur! 😤
+◈━━━━━━━━━━━━━━━━◈`));
+    process.exit(1);
+  }
+}
+
+// Connection utilities
+function getGreeting() {
+  const hour = DateTime.now().setZone("Africa/Nairobi").hour;
+  if (hour >= 5 && hour < 12) return "Hey there! Ready to kick off the day? 🚀";
+  if (hour >= 12 && hour < 18) return "What’s up? Time to make things happen! ⚡";
+  if (hour >= 18 && hour < 22) return "Evening vibes! Let’s get to it! 🌟";
+  return "Late night? Let’s see what’s cooking! 🌙";
+}
+
+function getCurrentTime() {
+  return DateTime.now().setZone("Africa/Nairobi").toLocaleString(DateTime.TIME_SIMPLE);
+}
+
+function toFancyFont(text, isUpperCase = false) {
+  const fonts = {
+    A: "𝘼",
+    B: "𝘽",
+    C: "𝘾",
+    D: "𝘿",
+    E: "𝙀",
+    F: "𝙁",
+    G: "𝙂",
+    H: "𝙃",
+    I: "𝙄",
+    J: "𝙅",
+    K: "𝙆",
+    L: "𝙇",
+    M: "𝙈",
+    N: "𝙉",
+    O: "𝙊",
+    P: "𝙋",
+    Q: "𝙌",
+    R: "𝙍",
+    S: "𝙎",
+    T: "𝙏",
+    U: "𝙐",
+    V: "𝙑",
+    W: "𝙒",
+    X: "𝙓",
+    Y: "𝙔",
+    Z: "𝙕",
+    a: "𝙖",
+    b: "𝙗",
+    c: "𝙘",
+    d: "𝙙",
+    e: "𝙚",
+    f: "𝙛",
+    g: "𝙜",
+    h: "𝙝",
+    i: "𝙞",
+    j: "𝙟",
+    k: "𝙠",
+    l: "𝙡",
+    m: "𝙢",
+    n: "𝙣",
+    o: "𝙤",
+    p: "𝙥",
+    q: "𝙦",
+    r: "𝙧",
+    s: "𝙨",
+    t: "𝙩",
+    u: "𝙪",
+    v: "𝙫",
+    w: "𝙬",
+    x: "𝙭",
+    y: "𝙮",
+    z: "𝙯",
+  };
+  const formattedText = isUpperCase ? text.toUpperCase() : text.toLowerCase();
+  return formattedText
+    .split("")
+    .map((char) => fonts[char] || char)
+    .join("");
+}
+
+// Toxic status replies
+const toxicReplies = [
+  "Yo, caught your status. Straight-up savage! 😈",
+  "Damn, that status tho! You out here wildin’! 🔥",
+  "Saw your status. Bruh, you’re on another level! 💀",
+  "What’s good? Your status is pure chaos! 😎",
+  "Status checked. You’re droppin’ bombs out here! 💣",
+  "Aight, peeped your status. Too lit! 😏",
+  "Your status? Absolute fire, no cap! 🚨",
+  "Just saw your status. Keep it 100, fam! 🖤",
+];
+
+async function start() {
+  try {
+    await loadBase64Session();
+    const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
+    const { version, isLatest } = await fetchLatestBaileysVersion();
+
+    const Matrix = makeWASocket({
+      version,
+      logger: pino({ level: "silent" }),
+      browser: ["Toxic-MD", "Chrome", "1.0.0"],
+      auth: state,
+      getMessage: async (key) => {
+        if (store) {
+          const msg = await store.loadMessage(key.remoteJid, key.id);
+          return msg.message || undefined;
+        }
+        return { conversation: "Toxic-MD whatsapp user bot" };
+      },
+    });
+
+    let hasSentStartMessage = false;
+
+    Matrix.ev.on("connection.update", async (update) => {
+      const { connection, lastDisconnect } = update;
+      if (connection === "close") {
+        const statusCode = lastDisconnect.error?.output?.statusCode;
+        switch (statusCode) {
+          case DisconnectReason.badSession:
+            console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Invalid session, delete session and add new SESSION_ID to .env! 💀
+◈━━━━━━━━━━━━━━━━◈`));
+            process.exit();
+            break;
+          case DisconnectReason.connectionClosed:
+            start();
+            break;
+          case DisconnectReason.connectionLost:
+            start();
+            break;
+          case DisconnectReason.connectionReplaced:
+            process.exit();
+            break;
+          case DisconnectReason.loggedOut:
+            console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Logged out, add new SESSION_ID to .env! 🔒
+◈━━━━━━━━━━━━━━━━◈`));
+            hasSentStartMessage = false;
+            process.exit();
+            break;
+          case DisconnectReason.restartRequired:
+            start();
+            break;
+          case DisconnectReason.timedOut:
+            start();
+            break;
+          default:
+            start();
+        }
+        return;
+      }
+
+      if (connection === "open") {
+        try {
+          await Matrix.groupAcceptInvite("GoXKLVJgTAAC3556FXkfFI");
+        } catch (error) {
+        
+        }
+
+        if (!hasSentStartMessage) {
+          const firstMessage = [
+            `◈━━━━━━━━━━━━━━━━◈`,
+            `│❒ *${getGreeting()}*`,
+            `│❒ Welcome to *Toxic-MD*! You're now connected.`,
+            ``,
+            `✨ *Bot Name*: Toxic-MD`,
+            `🔧 *Mode*: ${config.MODE || "public"}`,
+            `➡️ *Prefix*: ${prefix}`,
+            `🕒 *Time*: ${getCurrentTime()}`,
+            `💾 *Database*: None`,
+            `📚 *Library*: Baileys`,
+            ``,
+            `│❒ *Credits*: xh_clinton`,
+            `◈━━━━━━━━━━━━━━━━◈`,
+          ].join("\n");
+
+          const secondMessage = [
+            `◈━━━━━━━━━━━━━━━━◈`,
+            `│❒ Tap to view commands:`,
+            `◈━━━━━━━━━━━━━━━━◈`,
+          ].join("\n");
+
+          try {
+            await Matrix.sendMessage(Matrix.user.id, {
+              text: firstMessage,
+              footer: `Powered by Toxic-MD`,
+              viewOnce: true,
+              contextInfo: {
+                externalAdReply: {
+                  showAdAttribution: false,
+                  title: "Toxic-MD",
+                  body: `Bot initialized successfully.`,
+                  sourceUrl: `https://github.com/xhclintohn/Toxic-MD`,
+                  mediaType: 1,
+                  renderLargerThumbnail: true,
+                },
+              },
+            });
+
+            await Matrix.sendMessage(Matrix.user.id, {
+              text: secondMessage,
+              footer: `Powered by Toxic-MD`,
+              buttons: [
+                {
+                  buttonId: `${prefix}menu`,
+                  buttonText: { displayText: `📖 ${toFancyFont("MENU")}` },
+                  type: 1,
+                },
+              ],
+              headerType: 1,
+              viewOnce: true,
+              contextInfo: {
+                externalAdReply: {
+                  showAdAttribution: false,
+                  title: "Toxic-MD",
+                  body: `Select to proceed.`,
+                  sourceUrl: `https://github.com/xhclintohn/Toxic-MD`,
+                  mediaType: 1,
+                  renderLargerThumbnail: true,
+                },
+              },
+            });
+          } catch (error) {
+            console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Failed to send startup messages: ${error.message} 💀
+◈━━━━━━━━━━━━━━━━◈`));
+          }
+
+          hasSentStartMessage = true;
+        }
+
+        console.log(chalk.green(`◈━━━━━━━━━━━━━━━━◈
+│❒ Toxic-MD is live and ready to clown! 😎
+◈━━━━━━━━━━━━━━━━◈`));
+      }
+    });
+
+    Matrix.ev.on("creds.update", saveCreds);
+
+    Matrix.ev.on("messages.upsert", async (chatUpdate) => {
+      try {
+        const mek = chatUpdate.messages[0];
+        if (!mek || !mek.message) return;
+
+        // Skip protocol messages and reactions
+        if (
+          mek.message?.protocolMessage ||
+          mek.message?.ephemeralMessage ||
+          mek.message?.reactionMessage
+        )
+          return;
+
+        const fromJid = mek.key.participant || mek.key.remoteJid;
+
+        // Status handling
+        if (mek.key.remoteJid === "status@broadcast" && config.AUTO_STATUS_SEEN) {
+          await Matrix.readMessages([mek.key]);
+          if (config.AUTO_STATUS_REACT) {
+            const emojis = ['😈', '💀', '🔥', '🖕', '💥', '⚡', '🚀', '❤️', '💸', '😇', '🍂', '💯', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🎎', '🎏', '🎐', '⚽', '🧣', '🌿', '⛈️', '🌦️', '🌚', '🙈', '🙉', '🦖', '🐤', '🎗️', '🥇', '👾', '🔫', '🐝', '🦋', '🍓', '🍫', '🍭', '🧁', '🧃', '🍿', '🍻', '🎀', '🧸', '👑', '〽️', '😳', '☠️', '👻', '♥️', '🐼'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            await Matrix.sendMessage(mek.key.remoteJid, {
+              react: { text: randomEmoji, key: mek.key }
+            });
+          }
+          if (config.AUTO_STATUS_REPLY) {
+            const randomReply = toxicReplies[Math.floor(Math.random() * toxicReplies.length)];
+            await Matrix.sendMessage(fromJid, { text: randomReply }, { quoted: mek });
+          }
+          return;
+        }
+
+        // Auto-react
+        if (!mek.key.fromMe && config.AUTO_REACT && mek.message) {
+          const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+          await doReact(randomEmoji, mek, Matrix);
+        }
+
+        // Auto-read messages
+        if (config.AUTO_READ && !mek.key.fromMe) {
+          await Matrix.readMessages([mek.key]);
+        }
+
+        // Command handler
+        await Handler(chatUpdate, Matrix, logger);
+      } catch (err) {
+        console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Error in messages.upsert: ${err} 💀
+◈━━━━━━━━━━━━━━━━◈`));
+      }
+    });
+
+    Matrix.ev.on("call", async (json) => await Callupdate(json, Matrix));
+    Matrix.ev.on("group-participants.update", async (messag) => await GroupUpdate(Matrix, messag));
+
+    if (config.MODE === "public") {
+      Matrix.public = true;
+    } else if (config.MODE === "private") {
+      Matrix.public = false;
+    }
+  } catch (error) {
+    console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Critical Error: ${error} 💀
+◈━━━━━━━━━━━━━━━━◈`));
+    process.exit(1);
+  }
+}
+
+start();
+
+app.get("/", (req, res) => {
+  res.send("Toxic-MD is running!");
+});
+
+app.listen(PORT, () => {});
