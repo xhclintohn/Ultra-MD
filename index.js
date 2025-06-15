@@ -33,33 +33,34 @@ const __dirname = path.dirname(__filename);
 
 const sessionDir = path.join(__dirname, "session");
 const credsPath = path.join(sessionDir, "creds.json");
-const sessionFilePath = path.join(__dirname, "session.json");
 
 if (!fs.existsSync(sessionDir)) {
   fs.mkdirSync(sessionDir, { recursive: true });
 }
 
-// Load Base64 session from session.json
+// Load Base64 session from env
 async function loadBase64Session() {
-  if (!fs.existsSync(sessionFilePath)) {
-    console.error("❌ session.json file not found! Please create session.json with your SESSION_ID.");
+  const base64Creds = config.SESSION_ID;
+  if (!base64Creds || base64Creds === "Your Session Id") {
+    console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ No SESSION_ID? You tryna crash Toxic-MD, noob? 😡
+│❒ Add a valid base64 SESSION_ID to your .env!
+◈━━━━━━━━━━━━━━━━◈`));
     process.exit(1);
   }
 
   try {
-    const sessionData = JSON.parse(await fs.promises.readFile(sessionFilePath, "utf-8"));
-    const base64Creds = sessionData.SESSION_ID;
-    if (!base64Creds) {
-      console.error("❌ SESSION_ID not found in session.json!.");
-      process.exit(1);
-    }
-
     const credsBuffer = Buffer.from(base64Creds, "base64");
     await fs.promises.writeFile(credsPath, credsBuffer);
-    console.log("Session loaded");
+    console.log(chalk.green(`◈━━━━━━━━━━━━━━━━◈
+│❒ Session loaded, Toxic-MD’s ready to roast! 😈
+◈━━━━━━━━━━━━━━━━◈`));
     return true;
   } catch (error) {
-    console.error("❌ Failed to load or parse session.json:", error);
+    console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Failed to load SESSION_ID: ${error.message} 💀
+│❒ Fix your base64 string, you amateur! 😤
+◈━━━━━━━━━━━━━━━━◈`));
     process.exit(1);
   }
 }
@@ -156,7 +157,9 @@ async function start() {
     await loadBase64Session();
     const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
     const { version, isLatest } = await fetchLatestBaileysVersion();
-    console.log(`🤖 Toxic-MD using WA v${version.join(".")}, isLatest: ${isLatest}`);
+    console.log(chalk.green(`◈━━━━━━━━━━━━━━━━◈
+│❒ Toxic-MD using WA v${version.join(".")}, isLatest: ${isLatest} 😈
+◈━━━━━━━━━━━━━━━━◈`));
 
     const Matrix = makeWASocket({
       version,
@@ -180,36 +183,52 @@ async function start() {
         const statusCode = lastDisconnect.error?.output?.statusCode;
         switch (statusCode) {
           case DisconnectReason.badSession:
-            console.log(`⚠️ Invalid session file. Delete session and provide new SESSION_ID in session.json.`);
+            console.log(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Invalid session, delete session and add new SESSION_ID to .env! 💀
+◈━━━━━━━━━━━━━━━━◈`));
             process.exit();
             break;
           case DisconnectReason.connectionClosed:
-            console.log(`🔌 Connection closed. Reconnecting...`);
+            console.log(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Connection closed, reconnecting... 😤
+◈━━━━━━━━━━━━━━━━◈`));
             start();
             break;
           case DisconnectReason.connectionLost:
-            console.log(`📡 Lost connection. Reconnecting...`);
+            console.log(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Lost connection, reconnecting... 📡
+◈━━━━━━━━━━━━━━━━◈`));
             start();
             break;
           case DisconnectReason.connectionReplaced:
-            console.log(`🔄 Connection replaced. Terminating...`);
+            console.log(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Connection replaced, terminating... 🔄
+◈━━━━━━━━━━━━━━━━◈`));
             process.exit();
             break;
           case DisconnectReason.loggedOut:
-            console.log(`🔒 Logged out. Delete session and provide new SESSION_ID in session.json.`);
+            console.log(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Logged out, add new SESSION_ID to .env! 🔒
+◈━━━━━━━━━━━━━━━━◈`));
             hasSentStartMessage = false;
             process.exit();
             break;
           case DisconnectReason.restartRequired:
-            console.log(`🔄 Restart required. Reconnecting...`);
+            console.log(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Restart required, reconnecting... 🔄
+◈━━━━━━━━━━━━━━━━◈`));
             start();
             break;
           case DisconnectReason.timedOut:
-            console.log(`⏳ Timed out. Reconnecting...`);
+            console.log(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Timed out, reconnecting... ⏳
+◈━━━━━━━━━━━━━━━━◈`));
             start();
             break;
           default:
-            console.log(`❓ Unknown disconnect: ${statusCode}. Reconnecting...`);
+            console.log(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Unknown disconnect: ${statusCode}, reconnecting... ❓
+◈━━━━━━━━━━━━━━━━◈`));
             start();
         }
         return;
@@ -286,13 +305,17 @@ async function start() {
               },
             });
           } catch (error) {
-            console.error(chalk.red(`❌ Failed to send startup messages: ${error.message}`));
+            console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Failed to send startup messages: ${error.message} 💀
+◈━━━━━━━━━━━━━━━━◈`));
           }
 
           hasSentStartMessage = true;
         }
 
-        console.log(chalk.green(`✅ Connection established. Toxic-MD is operational.`));
+        console.log(chalk.green(`◈━━━━━━━━━━━━━━━━◈
+│❒ Toxic-MD is live and ready to clown! 😎
+◈━━━━━━━━━━━━━━━━◈`));
       }
     });
 
@@ -316,6 +339,17 @@ async function start() {
         // Status handling
         if (mek.key.remoteJid === "status@broadcast" && config.AUTO_STATUS_SEEN) {
           await Matrix.readMessages([mek.key]);
+          if (config.AUTO_STATUS_REACT) {
+            const jawadlike = await Matrix.decodeJid(Matrix.user.id);
+            const emojis = ['😈', '💀', '🔥', '🖕', '💥', '⚡', '🚀', '❤️', '💸', '😇', '🍂', '💯', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🎎', '🎏', '🎐', '⚽', '🧣', '🌿', '⛈️', '🌦️', '🌚', '🙈', '🙉', '🦖', '🐤', '🎗️', '🥇', '👾', '🔫', '🐝', '🦋', '🍓', '🍫', '🍭', '🧁', '🧃', '🍿', '🍻', '🎀', '🧸', '👑', '〽️', '😳', '☠️', '👻', '♥️', '🐼'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            await Matrix.sendMessage(mek.key.remoteJid, {
+              react: { text: randomEmoji, key: mek.key }
+            }, { statusJidList: [mek.key.participant, jawadlike] });
+            console.log(chalk.green(`◈━━━━━━━━━━━━━━━━◈
+│❒ Toxic-MD slapped ${randomEmoji} on status! 😎
+◈━━━━━━━━━━━━━━━━◈`));
+          }
           if (config.AUTO_STATUS_REPLY) {
             const randomReply = toxicReplies[Math.floor(Math.random() * toxicReplies.length)];
             await Matrix.sendMessage(fromJid, { text: randomReply }, { quoted: mek });
@@ -329,10 +363,20 @@ async function start() {
           await doReact(randomEmoji, mek, Matrix);
         }
 
+        // Auto-read messages
+        if (config.AUTO_READ && !mek.key.fromMe) {
+          await Matrix.readMessages([mek.key]);
+          console.log(chalk.green(`◈━━━━━━━━━━━━━━━━◈
+│❒ Toxic-MD marked message from ${mek.key.remoteJid} as read! 📖
+◈━━━━━━━━━━━━━━━━◈`));
+        }
+
         // Command handler
         await Handler(chatUpdate, Matrix, logger);
       } catch (err) {
-        console.error(chalk.red("Error in messages.upsert:", err));
+        console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Error in messages.upsert: ${err} 💀
+◈━━━━━━━━━━━━━━━━◈`));
       }
     });
 
@@ -345,7 +389,9 @@ async function start() {
       Matrix.public = false;
     }
   } catch (error) {
-    console.error(chalk.red("Critical Error:", error));
+    console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
+│❒ Critical Error: ${error} 💀
+◈━━━━━━━━━━━━━━━━◈`));
     process.exit(1);
   }
 }
@@ -357,5 +403,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(chalk.green(`◈━━━━━━━━━━━━━━━━◈
+│❒ Server live on port ${PORT}, Toxic-MD’s ready to wreck! 😈
+◈━━━━━━━━━━━━━━━━◈`));
 });
