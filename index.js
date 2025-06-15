@@ -340,14 +340,13 @@ async function start() {
         if (mek.key.remoteJid === "status@broadcast" && config.AUTO_STATUS_SEEN) {
           await Matrix.readMessages([mek.key]);
           if (config.AUTO_STATUS_REACT) {
-            const jawadlike = await Matrix.decodeJid(Matrix.user.id);
             const emojis = ['😈', '💀', '🔥', '🖕', '💥', '⚡', '🚀', '❤️', '💸', '😇', '🍂', '💯', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🎎', '🎏', '🎐', '⚽', '🧣', '🌿', '⛈️', '🌦️', '🌚', '🙈', '🙉', '🦖', '🐤', '🎗️', '🥇', '👾', '🔫', '🐝', '🦋', '🍓', '🍫', '🍭', '🧁', '🧃', '🍿', '🍻', '🎀', '🧸', '👑', '〽️', '😳', '☠️', '👻', '♥️', '🐼'];
             const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
             await Matrix.sendMessage(mek.key.remoteJid, {
               react: { text: randomEmoji, key: mek.key }
-            }, { statusJidList: [mek.key.participant, jawadlike] });
+            });
             console.log(chalk.green(`◈━━━━━━━━━━━━━━━━◈
-│❒ Toxic-MD slapped ${randomEmoji} on status! 😎
+│❒ Toxic-MD dropped ${randomEmoji} on that status! 😎
 ◈━━━━━━━━━━━━━━━━◈`));
           }
           if (config.AUTO_STATUS_REPLY) {
@@ -404,6 +403,6 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(chalk.green(`◈━━━━━━━━━━━━━━━━◈
-│❒ Server live on port ${PORT}, Toxic-MD’s ready to wreck! 😈
-◈━━━━━━━━━━━━━━━━◈`));
+│❒ Server live on port ${PORT}, Toxic-MD’s ready to wreck! 😈┖
+◈━━━━━━━━━━━━━━━━◈┖`));
 });
