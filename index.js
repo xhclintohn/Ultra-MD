@@ -38,13 +38,12 @@ if (!fs.existsSync(sessionDir)) {
   fs.mkdirSync(sessionDir, { recursive: true });
 }
 
-// Load Base64 session from env
+// Load session from environment
 async function loadBase64Session() {
   const base64Creds = config.SESSION_ID;
   if (!base64Creds || base64Creds === "Your Session Id") {
     console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
-│❒ No SESSION_ID? You tryna crash Toxic-MD, noob? 😡
-│❒ Add a valid base64 SESSION_ID to your .env!
+│❒ Invalid or missing SESSION_ID in .env
 ◈━━━━━━━━━━━━━━━━◈`));
     process.exit(1);
   }
@@ -55,14 +54,13 @@ async function loadBase64Session() {
     return true;
   } catch (error) {
     console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
-│❒ Failed to load SESSION_ID: ${error.message} 💀
-│❒ Fix your base64 string, you amateur! 😤
+│❒ Failed to load SESSION_ID: ${error.message}
 ◈━━━━━━━━━━━━━━━━◈`));
     process.exit(1);
   }
 }
 
-// Connection utilities
+// Get greeting based on time
 function getGreeting() {
   const hour = DateTime.now().setZone("Africa/Nairobi").hour;
   if (hour >= 5 && hour < 12) return "Hey there! Ready to kick off the day? 🚀";
@@ -71,64 +69,20 @@ function getGreeting() {
   return "Late night? Let’s see what’s cooking! 🌙";
 }
 
+// Get current time
 function getCurrentTime() {
   return DateTime.now().setZone("Africa/Nairobi").toLocaleString(DateTime.TIME_SIMPLE);
 }
 
+// Convert text to fancy font
 function toFancyFont(text, isUpperCase = false) {
   const fonts = {
-    A: "𝘼",
-    B: "𝘽",
-    C: "𝘾",
-    D: "𝘿",
-    E: "𝙀",
-    F: "𝙁",
-    G: "𝙂",
-    H: "𝙃",
-    I: "𝙄",
-    J: "𝙅",
-    K: "𝙆",
-    L: "𝙇",
-    M: "𝙈",
-    N: "𝙉",
-    O: "𝙊",
-    P: "𝙋",
-    Q: "𝙌",
-    R: "𝙍",
-    S: "𝙎",
-    T: "𝙏",
-    U: "𝙐",
-    V: "𝙑",
-    W: "𝙒",
-    X: "𝙓",
-    Y: "𝙔",
-    Z: "𝙕",
-    a: "𝙖",
-    b: "𝙗",
-    c: "𝙘",
-    d: "𝙙",
-    e: "𝙚",
-    f: "𝙛",
-    g: "𝙜",
-    h: "𝙝",
-    i: "𝙞",
-    j: "𝙟",
-    k: "𝙠",
-    l: "𝙡",
-    m: "𝙢",
-    n: "𝙣",
-    o: "𝙤",
-    p: "𝙥",
-    q: "𝙦",
-    r: "𝙧",
-    s: "𝙨",
-    t: "𝙩",
-    u: "𝙪",
-    v: "𝙫",
-    w: "𝙬",
-    x: "𝙭",
-    y: "𝙮",
-    z: "𝙯",
+    A: "𝘼", B: "𝘽", C: "𝘾", D: "𝘿", E: "𝙀", F: "𝙁", G: "𝙂", H: "𝙃", I: "𝙄", J: "𝙅",
+    K: "𝙆", L: "𝙇", M: "𝙈", N: "𝙉", O: "𝙊", P: "𝙋", Q: "𝙌", R: "𝙍", S: "𝙎", T: "𝙏",
+    U: "𝙐", V: "𝙑", W: "𝙒", X: "𝙓", Y: "𝙔", Z: "𝙕",
+    a: "𝙖", b: "𝙗", c: "𝙘", d: "𝙙", e: "𝙚", f: "𝙛", g: "𝙜", h: "𝙝", i: "𝙞", j: "𝙟",
+    k: "𝙠", l: "𝙡", m: "𝙢", n: "𝙣", o: "𝙤", p: "𝙥", q: "𝙦", r: "𝙧", s: "𝙨", t: "𝙩",
+    u: "𝙪", v: "𝙫", w: "𝙬", x: "𝙭", y: "𝙮", z: "𝙯",
   };
   const formattedText = isUpperCase ? text.toUpperCase() : text.toLowerCase();
   return formattedText
@@ -137,7 +91,7 @@ function toFancyFont(text, isUpperCase = false) {
     .join("");
 }
 
-// Toxic status replies
+// Status reply messages
 const toxicReplies = [
   "Yo, caught your status. Straight-up savage! 😈",
   "Damn, that status tho! You out here wildin’! 🔥",
@@ -153,7 +107,7 @@ async function start() {
   try {
     await loadBase64Session();
     const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
-    const { version, isLatest } = await fetchLatestBaileysVersion();
+    const { version } = await fetchLatestBaileysVersion();
 
     const Matrix = makeWASocket({
       version,
@@ -171,6 +125,7 @@ async function start() {
 
     let hasSentStartMessage = false;
 
+    // Connection update handler
     Matrix.ev.on("connection.update", async (update) => {
       const { connection, lastDisconnect } = update;
       if (connection === "close") {
@@ -178,14 +133,14 @@ async function start() {
         switch (statusCode) {
           case DisconnectReason.badSession:
             console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
-│❒ Invalid session, delete session and add new SESSION_ID to .env! 💀
+│❒ Invalid session, update SESSION_ID in .env
 ◈━━━━━━━━━━━━━━━━◈`));
             process.exit();
             break;
           case DisconnectReason.connectionClosed:
-            start();
-            break;
           case DisconnectReason.connectionLost:
+          case DisconnectReason.restartRequired:
+          case DisconnectReason.timedOut:
             start();
             break;
           case DisconnectReason.connectionReplaced:
@@ -193,16 +148,10 @@ async function start() {
             break;
           case DisconnectReason.loggedOut:
             console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
-│❒ Logged out, add new SESSION_ID to .env! 🔒
+│❒ Logged out, update SESSION_ID in .env
 ◈━━━━━━━━━━━━━━━━◈`));
             hasSentStartMessage = false;
             process.exit();
-            break;
-          case DisconnectReason.restartRequired:
-            start();
-            break;
-          case DisconnectReason.timedOut:
-            start();
             break;
           default:
             start();
@@ -214,7 +163,7 @@ async function start() {
         try {
           await Matrix.groupAcceptInvite("GoXKLVJgTAAC3556FXkfFI");
         } catch (error) {
-        
+          // Ignore group invite errors
         }
 
         if (!hasSentStartMessage) {
@@ -240,69 +189,64 @@ async function start() {
             `◈━━━━━━━━━━━━━━━━◈`,
           ].join("\n");
 
-          try {
-            await Matrix.sendMessage(Matrix.user.id, {
-              text: firstMessage,
-              footer: `Powered by Toxic-MD`,
-              viewOnce: true,
-              contextInfo: {
-                externalAdReply: {
-                  showAdAttribution: false,
-                  title: "Toxic-MD",
-                  body: `Bot initialized successfully.`,
-                  sourceUrl: `https://github.com/xhclintohn/Toxic-MD`,
-                  mediaType: 1,
-                  renderLargerThumbnail: true,
-                },
+          await Matrix.sendMessage(Matrix.user.id, {
+            text: firstMessage,
+            footer: `Powered by Toxic-MD`,
+            viewOnce: true,
+            contextInfo: {
+              externalAdReply: {
+                showAdAttribution: false,
+                title: "Toxic-MD",
+                body: `Bot initialized successfully.`,
+                sourceUrl: `https://github.com/xhclintohn/Toxic-MD`,
+                mediaType: 1,
+                renderLargerThumbnail: true,
               },
-            });
+            },
+          });
 
-            await Matrix.sendMessage(Matrix.user.id, {
-              text: secondMessage,
-              footer: `Powered by Toxic-MD`,
-              buttons: [
-                {
-                  buttonId: `${prefix}menu`,
-                  buttonText: { displayText: `📖 ${toFancyFont("MENU")}` },
-                  type: 1,
-                },
-              ],
-              headerType: 1,
-              viewOnce: true,
-              contextInfo: {
-                externalAdReply: {
-                  showAdAttribution: false,
-                  title: "Toxic-MD",
-                  body: `Select to proceed.`,
-                  sourceUrl: `https://github.com/xhclintohn/Toxic-MD`,
-                  mediaType: 1,
-                  renderLargerThumbnail: true,
-                },
+          await Matrix.sendMessage(Matrix.user.id, {
+            text: secondMessage,
+            footer: `Powered by Toxic-MD`,
+            buttons: [
+              {
+                buttonId: `${prefix}menu`,
+                buttonText: { displayText: `📖 ${toFancyFont("MENU")}` },
+                type: 1,
               },
-            });
-          } catch (error) {
-            console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
-│❒ Failed to send startup messages: ${error.message} 💀
-◈━━━━━━━━━━━━━━━━◈`));
-          }
+            ],
+            headerType: 1,
+            viewOnce: true,
+            contextInfo: {
+              externalAdReply: {
+                showAdAttribution: false,
+                title: "Toxic-MD",
+                body: `Select to proceed.`,
+                sourceUrl: `https://github.com/xhclintohn/Toxic-MD`,
+                mediaType: 1,
+                renderLargerThumbnail: true,
+              },
+            },
+          });
 
           hasSentStartMessage = true;
         }
 
         console.log(chalk.green(`◈━━━━━━━━━━━━━━━━◈
-│❒ Toxic-MD is live and ready to clown! 😎
+│❒ Toxic-MD connected
 ◈━━━━━━━━━━━━━━━━◈`));
       }
     });
 
+    // Save credentials
     Matrix.ev.on("creds.update", saveCreds);
 
+    // Message handler
     Matrix.ev.on("messages.upsert", async (chatUpdate) => {
       try {
         const mek = chatUpdate.messages[0];
         if (!mek || !mek.message) return;
 
-        // Skip protocol messages and reactions
         if (
           mek.message?.protocolMessage ||
           mek.message?.ephemeralMessage ||
@@ -315,13 +259,16 @@ async function start() {
         // Status handling
         if (mek.key.remoteJid === "status@broadcast" && config.AUTO_STATUS_SEEN) {
           await Matrix.readMessages([mek.key]);
-          if (config.AUTO_STATUS_REACT) {
-            const emojis = ['😈', '💀', '🔥', '🖕', '💥', '⚡', '🚀', '❤️', '💸', '😇', '🍂', '💯', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🎎', '🎏', '🎐', '⚽', '🧣', '🌿', '⛈️', '🌦️', '🌚', '🙈', '🙉', '🦖', '🐤', '🎗️', '🥇', '👾', '🔫', '🐝', '🦋', '🍓', '🍫', '🍭', '🧁', '🧃', '🍿', '🍻', '🎀', '🧸', '👑', '〽️', '😳', '☠️', '👻', '♥️', '🐼'];
-            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-            await Matrix.sendMessage(mek.key.remoteJid, {
-              react: { text: randomEmoji, key: mek.key }
-            });
+          // Autolike function
+          if (config.AUTO_LIKE) {
+            const autolikeEmojis = ['🗿', '⌚️', '💠', '👣', '🍆', '💔', '🤍', '❤️‍🔥', '💣', '🧠', '🦅', '🌻', '🧊', '🛑', '🧸', '👑', '📍', '😅', '🎭', '🎉', '😳', '💯', '🔥', '💫', '🐒', '💗', '❤️‍🔥', '👁️', '👀', '🙌', '🙆', '🌟', '💧', '🦄', '🟢', '🎎', '✅', '🥱', '🌚', '💚', '💕', '😉', '😒'];
+            const randomEmoji = autolikeEmojis[Math.floor(Math.random() * autolikeEmojis.length)];
+            const nickk = await Matrix.decodeJid(Matrix.user.id);
+            await Matrix.sendMessage(mek.key.remoteJid, { 
+              react: { text: randomEmoji, key: mek.key } 
+            }, { statusJidList: [mek.key.participant, nickk] });
           }
+          // Status reply function
           if (config.AUTO_STATUS_REPLY) {
             const randomReply = toxicReplies[Math.floor(Math.random() * toxicReplies.length)];
             await Matrix.sendMessage(fromJid, { text: randomReply }, { quoted: mek });
@@ -329,13 +276,13 @@ async function start() {
           return;
         }
 
-        // Auto-react
+        // Auto-react function
         if (!mek.key.fromMe && config.AUTO_REACT && mek.message) {
           const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
           await doReact(randomEmoji, mek, Matrix);
         }
 
-        // Auto-read messages
+        // Auto-read function
         if (config.AUTO_READ && !mek.key.fromMe) {
           await Matrix.readMessages([mek.key]);
         }
@@ -343,15 +290,17 @@ async function start() {
         // Command handler
         await Handler(chatUpdate, Matrix, logger);
       } catch (err) {
-        console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
-│❒ Error in messages.upsert: ${err} 💀
-◈━━━━━━━━━━━━━━━━◈`));
+        // Suppress non-critical errors
       }
     });
 
+    // Call handler
     Matrix.ev.on("call", async (json) => await Callupdate(json, Matrix));
+
+    // Group update handler
     Matrix.ev.on("group-participants.update", async (messag) => await GroupUpdate(Matrix, messag));
 
+    // Set bot mode
     if (config.MODE === "public") {
       Matrix.public = true;
     } else if (config.MODE === "private") {
@@ -359,7 +308,7 @@ async function start() {
     }
   } catch (error) {
     console.error(chalk.red(`◈━━━━━━━━━━━━━━━━◈
-│❒ Critical Error: ${error} 💀
+│❒ Critical Error: ${error.message}
 ◈━━━━━━━━━━━━━━━━◈`));
     process.exit(1);
   }
